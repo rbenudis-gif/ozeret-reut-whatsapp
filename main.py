@@ -80,6 +80,11 @@ async def webhook(request: Request):
     if not text.strip():
         return {"ok": True, "skipped": "empty"}
 
+    # Only respond to messages from the owner's phone number
+    if settings.OWNER_PHONE and phone != settings.OWNER_PHONE:
+        logger.info(f"Ignoring message from non-owner: {phone}")
+        return {"ok": True, "skipped": "not_owner"}
+
     # Deduplication
     _cleanup_seen()
     if message_id in _seen_messages:

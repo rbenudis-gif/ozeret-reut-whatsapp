@@ -44,6 +44,10 @@ class Settings:
 
     MAX_HISTORY: int = int(os.getenv("MAX_HISTORY", "20"))
 
+    # Owner phone number - only respond to messages from this number
+    # Format: international without + (e.g. 972501234567)
+    OWNER_PHONE: str = os.getenv("OWNER_PHONE", "")
+
     # Database
     DATABASE_PATH: str = os.getenv("DATABASE_PATH", "./conversations.db")
 
