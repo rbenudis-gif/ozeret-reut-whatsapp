@@ -9,11 +9,12 @@ from contextlib import asynccontextmanager
 
 import httpx
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 
 from config import settings
 from agent import get_response
 from database import init_db
+import google_services as gs
 
 # Logging
 logging.basicConfig(level=logging.INFO)
@@ -44,7 +45,28 @@ app = FastAPI(title="עוזר רעות", lifespan=lifespan)
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "agent": "עוזר רעות"}
+    google_connected = gs.get_credentials() is not None
+    return {"status": "ok", "agent": "עוזר רעות", "google_connected": google_connected}
+
+
+@app.get("/auth/google")
+async def auth_google():
+    """Start Google OAuth flow."""
+    try:
+        auth_url = gs.get_auth_url()
+        return RedirectResponse(url=auth_url)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+@app.get("/oauth/callback")
+async def oauth_callback(code: str):
+    """Handle Google OAuth callback."""
+    try:
+        gs.exchange_code(code)
+        return {"status": "success", "message": "Google חובר בהצלחה! אפשר לסגור את הדף."}
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
 
 
 @app.post("/webhook/green-api")
@@ -55,9 +77,10 @@ async def webhook(request: Request):
     except Exception:
         return JSONResponse({"error": "invalid json"}, status_code=400)
 
-    # Only process incoming text messages
+    # Process incoming and outgoing (from device) text messages
     webhook_type = data.get("typeWebhook")
-    if webhook_type != "incomingMessageReceived":
+    logger.info(f"Webhook type: {webhook_type}")
+    if webhook_type not in ("incomingMessageReceived", "outgoingMessageReceived"):
         return {"ok": True, "skipped": webhook_type}
 
     message_data = data.get("messageData", {})
@@ -70,6 +93,12 @@ async def webhook(request: Request):
     chat_id = sender_data.get("chatId", "")
     sender_name = sender_data.get("senderName", "")
     text = message_data.get("textMessageData", {}).get("textMessage", "")
+
+    # For outgoing messages, skip bot's own replies to avoid infinite loop
+    if webhook_type == "outgoingMessageReceived":
+        sender_id = sender_data.get("sender", "")
+        if not sender_id or sender_id == chat_id:
+            return {"ok": True, "skipped": "self_reply"}
     message_id = data.get("idMessage", "")
 
     # Skip group messages (only respond to direct messages)
