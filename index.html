@@ -141,12 +141,6 @@ h1 { font-size: 2rem; font-weight: 900; background: linear-gradient(90deg, #f0ab
 .streak-badge.hot .streak-val { color: #f97316; animation: pulse 0.5s ease-in-out infinite alternate; }
 @keyframes pulse { from{transform:scale(1)} to{transform:scale(1.15)} }
 
-.timer-ring { position: relative; width: 52px; height: 52px; }
-.timer-ring svg { transform: rotate(-90deg); }
-.timer-ring circle { fill: none; stroke-width: 4; }
-.timer-track { stroke: rgba(255,255,255,0.1); }
-.timer-arc { stroke: var(--purple); stroke-linecap: round; transition: stroke-dashoffset 0.1s linear, stroke 0.3s; }
-.timer-num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 900; }
 
 /* Question card */
 .q-card {
@@ -325,13 +319,6 @@ h1 { font-size: 2rem; font-weight: 900; background: linear-gradient(90deg, #f0ab
       <span class="streak-label">COMBO</span>
       <span class="streak-val" id="g-streak">×1</span>
     </div>
-    <div class="timer-ring">
-      <svg width="52" height="52" viewBox="0 0 52 52">
-        <circle class="timer-track" cx="26" cy="26" r="22"/>
-        <circle class="timer-arc" id="timer-arc" cx="26" cy="26" r="22" stroke-dasharray="138.2" stroke-dashoffset="0"/>
-      </svg>
-      <div class="timer-num" id="timer-num">10</div>
-    </div>
   </div>
 
   <!-- Question -->
@@ -428,7 +415,6 @@ const WORDS = [
   {en:"Goodbye",  pron:"גודבאי",   he:"להתראות"},
 ];
 
-const CIRCUMFERENCE = 2 * Math.PI * 22; // 138.2
 
 // ---- STUDY STATE ----
 let studyList = [...WORDS];
@@ -444,8 +430,6 @@ let gStreak = 0;
 let gBestStreak = 0;
 let gCorrect = 0;
 let gMissed = []; // {word, chosen}
-let timerInterval = null;
-let timeLeft = 10;
 let answered = false;
 
 // ---- HELPERS ----
@@ -515,8 +499,6 @@ function goGame() {
 }
 
 function clearGame() {
-  if (timerInterval) clearInterval(timerInterval);
-  timerInterval = null;
 }
 
 function getMultiplier() {
@@ -566,55 +548,12 @@ function renderQuestion() {
     container.appendChild(btn);
   });
 
-  startTimer();
 }
 
-function startTimer() {
-  timeLeft = 10;
-  updateTimerUI();
-  if (timerInterval) clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    timeLeft -= 0.1;
-    if (timeLeft <= 0) {
-      timeLeft = 0;
-      updateTimerUI();
-      clearInterval(timerInterval);
-    } else {
-      updateTimerUI();
-    }
-  }, 100);
-}
-
-function updateTimerUI() {
-  const pct = timeLeft / 10;
-  const offset = CIRCUMFERENCE * (1 - pct);
-  const arc = document.getElementById('timer-arc');
-  arc.style.strokeDashoffset = offset;
-  arc.style.stroke = pct > 0.5 ? '#7c3aed' : pct > 0.25 ? '#f97316' : '#ef4444';
-  document.getElementById('timer-num').textContent = Math.ceil(timeLeft);
-}
-
-function timeUp() {
-  answered = true;
-  gLives--;
-  gStreak = 0;
-  const w = gQueue[gIdx];
-  gMissed.push({word: w, chosen: '⏱️ פג הזמן'});
-  // Highlight correct
-  document.querySelectorAll('.opt-btn').forEach(btn => {
-    if (btn.textContent === w.he) btn.classList.add('correct');
-    btn.disabled = true;
-  });
-  showFeedback('⏱️');
-  updateHUD();
-  setTimeout(() => { gIdx++; renderQuestion(); }, 1200);
-}
 
 function handleAnswer(btn, isCorrect, w) {
   if (answered) return;
   answered = true;
-  clearInterval(timerInterval);
-
   if (isCorrect) {
     btn.classList.add('correct');
     const speedBonus = Math.round(timeLeft * 20); // up to 200
