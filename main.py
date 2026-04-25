@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 
 import httpx
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse, HTMLResponse
 
 from config import settings
 from agent import get_response
@@ -41,6 +41,15 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="עוזר רעות", lifespan=lifespan)
+
+
+@app.get("/shaked", response_class=HTMLResponse)
+async def shaked_game():
+    """Serve Shaked's English vocabulary game."""
+    import os
+    html_path = os.path.join(os.path.dirname(__file__), "shaked-english.html")
+    with open(html_path, "r", encoding="utf-8") as f:
+        return f.read()
 
 
 @app.get("/health")
