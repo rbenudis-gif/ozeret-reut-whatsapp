@@ -119,6 +119,9 @@ async def webhook(request: Request):
             return {"ok": True, "skipped": "self_reply"}
     message_id = data.get("idMessage", "")
 
+    # Extract phone number from chat_id (remove @c.us)
+    phone = chat_id.replace("@c.us", "")
+
     # Skip group messages (only respond to direct messages)
     if "@g.us" in chat_id:
         return {"ok": True, "skipped": "group_message"}
@@ -137,9 +140,6 @@ async def webhook(request: Request):
     if message_id in _seen_messages:
         return {"ok": True, "skipped": "duplicate"}
     _seen_messages[message_id] = time.time()
-
-    # Extract phone number from chat_id (remove @c.us)
-    phone = chat_id.replace("@c.us", "")
 
     logger.info(f"Message from {sender_name} ({phone}): {text[:50]}...")
 

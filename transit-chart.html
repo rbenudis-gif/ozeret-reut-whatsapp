@@ -894,7 +894,7 @@ tr:hover td{background:rgba(160,118,38,0.04)}
   }
 }
 </style>
-<script src="astronomy.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2/astronomy.min.js"></script>
 </head>
 <body>
 <canvas class="stars" id="stars"></canvas>
@@ -1671,7 +1671,7 @@ function computeAllPlanets(jd){
 }
 
 // ─── Chart Coordinate ─────────────────────────────────────────────────────────
-function lonToXY(lon,r){const a=rad(180-lon);return{x:CX+r*Math.cos(a),y:CY+r*Math.sin(a)};}
+function lonToXY(lon,r,rot=0){const a=rad(180-lon+rot);return{x:CX+r*Math.cos(a),y:CY+r*Math.sin(a)};}
 function svgEl(tag,attrs,txt){
   const el=document.createElementNS('http://www.w3.org/2000/svg',tag);
   for(const k in attrs)el.setAttribute(k,attrs[k]);
@@ -1680,7 +1680,7 @@ function svgEl(tag,attrs,txt){
 }
 
 // ─── Draw Zodiac Base (shared) ────────────────────────────────────────────────
-function drawZodiacBase(svg,bgId){
+function drawZodiacBase(svg,bgId,rot=0){
   const defs=svgEl('defs',{});
   // Gradient: very light blue outer → cream inner
   const rg=svgEl('radialGradient',{id:bgId,cx:'50%',cy:'50%',r:'50%'});
@@ -1695,7 +1695,7 @@ function drawZodiacBase(svg,bgId){
   // גלגל מזלות — סקטורים
   SIGNS.forEach((s,i)=>{
     const l1=i*30,l2=l1+30;
-    const p1=lonToXY(l1,R.zo),p2=lonToXY(l2,R.zo),p3=lonToXY(l2,R.zi),p4=lonToXY(l1,R.zi);
+    const p1=lonToXY(l1,R.zo,rot),p2=lonToXY(l2,R.zo,rot),p3=lonToXY(l2,R.zi,rot),p4=lonToXY(l1,R.zi,rot);
     const arch=SIGN_ARCHETYPE[i];
     const sector=svgEl('path',{d:`M${p1.x},${p1.y} A${R.zo},${R.zo} 0 0,1 ${p2.x},${p2.y} L${p3.x},${p3.y} A${R.zi},${R.zi} 0 0,0 ${p4.x},${p4.y} Z`,
       fill:ELCOLS[s.el],stroke:'#aaa','stroke-width':'0.8',style:'cursor:pointer'});
@@ -1704,11 +1704,11 @@ function drawZodiacBase(svg,bgId){
       sector.appendChild(t);}
     svg.appendChild(sector);
     // גליף מזל
-    const mid=lonToXY(l1+15,(R.zo+R.zi)/2);
+    const mid=lonToXY(l1+15,(R.zo+R.zi)/2,rot);
     svg.appendChild(svgEl('text',{x:mid.x,y:mid.y,'text-anchor':'middle','dominant-baseline':'middle',
       'font-size':'22','fill':s.col,'font-family':'serif','font-weight':'bold'},s.g));
     // קו גבול מזל
-    const pa=lonToXY(l1,R.zo),pb=lonToXY(l1,R.zi);
+    const pa=lonToXY(l1,R.zo,rot),pb=lonToXY(l1,R.zi,rot);
     svg.appendChild(svgEl('line',{x1:pa.x,y1:pa.y,x2:pb.x,y2:pb.y,stroke:'#999','stroke-width':'0.8'}));
   });
 
@@ -1718,7 +1718,7 @@ function drawZodiacBase(svg,bgId){
     const len=is30?0:is10?8:is5?5:3;
     if(is30)continue; // גבולות מזל כבר מצוירים
     const rOut=R.zo,rIn=R.zo-len;
-    const pa=lonToXY(d,rOut),pb=lonToXY(d,rIn);
+    const pa=lonToXY(d,rOut,rot),pb=lonToXY(d,rIn,rot);
     svg.appendChild(svgEl('line',{x1:pa.x,y1:pa.y,x2:pb.x,y2:pb.y,
       stroke:'#888','stroke-width':is10?'0.9':'0.5','stroke-opacity':'0.7'}));
   }
@@ -1728,7 +1728,7 @@ function drawZodiacBase(svg,bgId){
   svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:R.zi,fill:'none',stroke:'#aaa','stroke-width':'1'}));
 }
 
-function drawHouses(svg,housesArr,showNums){
+function drawHouses(svg,housesArr,showNums,rot=0){
   // טבעת הפרדה בין נטלי לאזור בתים
   svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:R.zi,fill:'rgba(255,255,255,0.0)'}));
   // מעגל פנימי
@@ -1739,34 +1739,34 @@ function drawHouses(svg,housesArr,showNums){
   housesArr.forEach((h,i)=>{
     const isMain=[0,3,6,9].includes(i);
     // קו בית מגלגל ועד מרכז
-    const pa=lonToXY(h,R.zi),pb=lonToXY(h,12);
+    const pa=lonToXY(h,R.zi,rot),pb=lonToXY(h,12,rot);
     svg.appendChild(svgEl('line',{x1:pa.x,y1:pa.y,x2:pb.x,y2:pb.y,
       stroke:isMain?'rgba(0,0,0,0.8)':'rgba(80,80,80,0.35)',
       'stroke-width':isMain?1.8:0.8}));
     if(showNums){
-      const mid=mod360(h+15),pr=lonToXY(mid,R.ai-28);
+      const mid=mod360(h+15),pr=lonToXY(mid,R.ai-28,rot);
       svg.appendChild(svgEl('text',{x:pr.x,y:pr.y,'text-anchor':'middle','dominant-baseline':'middle',
         'font-size':'12','fill':'#444','font-weight':'500'},String(i+1)));
     }
   });
 }
 
-function drawAxisLabels(svg,asc){
+function drawAxisLabels(svg,asc,rot=0){
   const mc=mcLon||mod360(asc+270);
   [{lon:asc,l:'ASC',c:'#8a6010'},{lon:mod360(asc+180),l:'האופק',c:'#334d99'},
    {lon:mc,l:'MC',c:'#555'},{lon:mod360(mc+180),l:'IC',c:'#555'}]
   .forEach(({lon,l,c})=>{
     // קו ציר מגלגל לגלגל
-    const pa=lonToXY(lon,R.zi),pb=lonToXY(lon,12);
+    const pa=lonToXY(lon,R.zi,rot),pb=lonToXY(lon,12,rot);
     svg.appendChild(svgEl('line',{x1:pa.x,y1:pa.y,x2:pb.x,y2:pb.y,stroke:'rgba(0,0,0,0.75)','stroke-width':'1.8'}));
     // תווית מחוץ לגלגל
-    const pt=lonToXY(lon,R.zo+30);
+    const pt=lonToXY(lon,R.zo+30,rot);
     svg.appendChild(svgEl('text',{x:pt.x,y:pt.y,'text-anchor':'middle','dominant-baseline':'middle',
       'font-size':'10','fill':c,'font-weight':'bold'},l));
   });
 }
 
-function drawPlanets(svg,data,ringR,edgeR,fontSize,isTransit){
+function drawPlanets(svg,data,ringR,edgeR,fontSize,isTransit,rot=0){
   const used=[];
   data.lons.forEach((lon,i)=>{
     let offset=0;
@@ -1774,25 +1774,25 @@ function drawPlanets(svg,data,ringR,edgeR,fontSize,isTransit){
     used.push(lon);
     const r=ringR-offset;
     // נקודה על הגבול
-    const pe=lonToXY(lon,edgeR);
+    const pe=lonToXY(lon,edgeR,rot);
     svg.appendChild(svgEl('circle',{cx:pe.x,cy:pe.y,r:'2',fill:isTransit?PLANETS[i].col:'#333'}));
     // קו קטן מהגבול לגליף
-    const plink=lonToXY(lon,r+4);
+    const plink=lonToXY(lon,r+4,rot);
     svg.appendChild(svgEl('line',{x1:pe.x,y1:pe.y,x2:plink.x,y2:plink.y,
       stroke:isTransit?PLANETS[i].col:'#aaa','stroke-width':'0.7','stroke-opacity':'0.6'}));
     // גליף
-    const pg=lonToXY(lon,r);
+    const pg=lonToXY(lon,r,rot);
     const col=isTransit?PLANETS[i].col:'#222';
     svg.appendChild(svgEl('text',{x:pg.x,y:pg.y,'text-anchor':'middle','dominant-baseline':'middle',
       'font-size':String(fontSize),'fill':col,'font-family':'serif','font-weight':'bold'},PLANETS[i].g));
     // מעלה
     const degNum=Math.floor(lon%30);
-    const pd=lonToXY(lon,r-fontSize-2);
+    const pd=lonToXY(lon,r-fontSize-2,rot);
     svg.appendChild(svgEl('text',{x:pd.x,y:pd.y,'text-anchor':'middle','dominant-baseline':'middle',
       'font-size':'8.5','fill':col},String(degNum)));
     // Rx
     if(data.retros[i]){
-      const pr=lonToXY(lon,r-fontSize-12);
+      const pr=lonToXY(lon,r-fontSize-12,rot);
       svg.appendChild(svgEl('text',{x:pr.x,y:pr.y,'text-anchor':'middle','dominant-baseline':'middle',
         'font-size':'8','fill':'#c02020','font-weight':'700'},'Rx'));
     }
@@ -1805,7 +1805,8 @@ let natalData={lons:[],retros:[]},transitData={lons:[],retros:[]},ascLon=0,mcLon
 function drawChart(){
   const svg=document.getElementById('astroChart');
   svg.innerHTML='';
-  drawZodiacBase(svg,'bg1');
+  const rot=ascLon;
+  drawZodiacBase(svg,'bg1',rot);
 
   // טבעת חיצונית לכוכבי מעבר
   svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:R.to,fill:'none',stroke:'#999','stroke-width':'1'}));
@@ -1813,21 +1814,21 @@ function drawChart(){
   // אזור כוכבי לידה (בין גלגל לטבעת פנימית)
   svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:R.zi,fill:'rgba(255,255,255,0.6)',stroke:'#aaa','stroke-width':'0.8'}));
 
-  drawHouses(svg,houses,true);
-  drawAxisLabels(svg,ascLon);
+  drawHouses(svg,houses,true,rot);
+  drawAxisLabels(svg,ascLon,rot);
 
   // קווי אספקטים
   calcAspects(natalData.lons,transitData.lons).forEach(({ni,ti,asp})=>{
-    const pn=lonToXY(natalData.lons[ni],R.ai),pt=lonToXY(transitData.lons[ti],R.ai);
+    const pn=lonToXY(natalData.lons[ni],R.ai,rot),pt=lonToXY(transitData.lons[ti],R.ai,rot);
     const attrs={x1:pn.x,y1:pn.y,x2:pt.x,y2:pt.y,stroke:asp.col,'stroke-width':'1.6','stroke-opacity':'0.72'};
     if(asp.dash) attrs['stroke-dasharray']='7,4';
     svg.appendChild(svgEl('line',attrs));
   });
 
   // כוכבי לידה — בין גלגל לטבעת פנימית
-  drawPlanets(svg,natalData,R.np,R.zi,28,false);
+  drawPlanets(svg,natalData,R.np,R.zi,28,false,rot);
   // כוכבי מעבר — מחוץ לגלגל
-  drawPlanets(svg,transitData,R.tp,R.zo,30,true);
+  drawPlanets(svg,transitData,R.tp,R.zo,30,true,rot);
 
   // מעגל מרכז
   svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:10,fill:'#fff',stroke:'#999','stroke-width':'1.2'}));
@@ -2435,14 +2436,15 @@ function buildHouseReading(){
 }
 function drawNatalOnlyChart(){
   const svg=document.getElementById('natalSvg');svg.innerHTML='';
-  drawZodiacBase(svg,'bgN');
-  drawHouses(svg,houses,true);
-  drawAxisLabels(svg,ascLon);
+  const rot=ascLon;
+  drawZodiacBase(svg,'bgN',rot);
+  drawHouses(svg,houses,true,rot);
+  drawAxisLabels(svg,ascLon,rot);
   calcNatalAspects(natalData.lons).forEach(({pi,pj,asp})=>{
-    const p1=lonToXY(natalData.lons[pi],R.ai-5),p2=lonToXY(natalData.lons[pj],R.ai-5);
+    const p1=lonToXY(natalData.lons[pi],R.ai-5,rot),p2=lonToXY(natalData.lons[pj],R.ai-5,rot);
     svg.appendChild(svgEl('line',{x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,stroke:asp.col,'stroke-width':'0.7','stroke-opacity':'0.45'}));
   });
-  drawPlanets(svg,natalData,R.np,R.zi,15,false);
+  drawPlanets(svg,natalData,R.np,R.zi,15,false,rot);
   svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:8,fill:'#1a0840',stroke:'#6030a0','stroke-width':'1.5'}));
 }
 function buildNatalTables(){
@@ -2515,17 +2517,18 @@ function renderSynastryView(){
 }
 function drawSynastryChart(){
   const svg=document.getElementById('synastrySvg');svg.innerHTML='';
-  drawZodiacBase(svg,'bgS');
+  const rot=ascLon;
+  drawZodiacBase(svg,'bgS',rot);
   svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:R.to,fill:'none',stroke:'#999','stroke-width':'1'}));
-  drawHouses(svg,houses,false);
+  drawHouses(svg,houses,false,rot);
   calcAspects(natalData.lons,person2Data.lons).forEach(({ni,ti,asp})=>{
-    const pn=lonToXY(natalData.lons[ni],R.ai),pt=lonToXY(person2Data.lons[ti],R.ai);
+    const pn=lonToXY(natalData.lons[ni],R.ai,rot),pt=lonToXY(person2Data.lons[ti],R.ai,rot);
     const attrs={x1:pn.x,y1:pn.y,x2:pt.x,y2:pt.y,stroke:asp.col,'stroke-width':'1.4','stroke-opacity':'0.6'};
     if(asp.dash)attrs['stroke-dasharray']='7,4';
     svg.appendChild(svgEl('line',attrs));
   });
-  drawPlanets(svg,natalData,R.np,R.zi,14,false);
-  drawPlanets(svg,person2Data,R.tp,R.zo,14,true);
+  drawPlanets(svg,natalData,R.np,R.zi,14,false,rot);
+  drawPlanets(svg,person2Data,R.tp,R.zo,14,true,rot);
   svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:10,fill:'#fff',stroke:'#999','stroke-width':'1.2'}));
 }
 function buildSynastryTables(){
@@ -2756,14 +2759,16 @@ function buildDrumCol(id, items, selIdx, onChange){
 
   // גלול לאיבר הנבחר (המודאל כבר גלוי)
   requestAnimationFrame(()=>{
-    col.scrollTop=selIdx*40;
+    const itemH=col.querySelector('.drum-item')?col.querySelector('.drum-item').offsetHeight:40;
+    col.scrollTop=selIdx*itemH;
     markSel(col,selIdx);
   });
 
   let ticking=false;
   col.addEventListener('scroll',()=>{
     if(!ticking){requestAnimationFrame(()=>{
-      const idx=Math.round(col.scrollTop/40);
+      const itemH=col.querySelector('.drum-item')?col.querySelector('.drum-item').offsetHeight:40;
+      const idx=Math.round(col.scrollTop/itemH);
       markSel(col,idx);
       if(items[idx]!==undefined) onChange(items[idx]);
       ticking=false;
