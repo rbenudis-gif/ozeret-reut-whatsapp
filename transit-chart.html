@@ -1,0 +1,3188 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AstroIL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Serif+Hebrew:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async onload="initGoogleSignIn()"></script>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#f6f1e9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="AstroIL">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+:root{
+  --bg:#f6f1e9;--bg2:#ede7da;
+  --card:rgba(255,252,247,0.97);
+  --border-gold:rgba(160,118,38,0.2);
+  --gold:#9a7020;--gold-bright:#b88a28;
+  --text:#261a38;--text-dim:#8a7898;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Serif Hebrew','Segoe UI',serif;background:var(--bg);color:var(--text);direction:rtl;min-height:100vh;overflow-x:hidden}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 65% 45% at 10% 20%,rgba(255,240,200,0.5) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 40% at 90% 80%,rgba(220,230,255,0.25) 0%,transparent 55%),
+    radial-gradient(ellipse 40% 30% at 50% 50%,rgba(255,248,228,0.3) 0%,transparent 65%);
+}
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.35;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  background-size:200px;
+}
+.stars{display:none}
+
+/* ── HEADER ── */
+header{
+  position:relative;z-index:100;
+  background:rgba(255,252,247,0.97);
+  border-bottom:1px solid var(--border-gold);
+  box-shadow:0 1px 24px rgba(160,118,38,0.08);
+  padding:0 20px;display:flex;align-items:center;justify-content:space-between;
+  height:68px;flex-wrap:nowrap;gap:10px;direction:ltr;overflow:visible;
+}
+header::after{
+  content:'';position:absolute;bottom:0;left:8%;right:8%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(160,118,38,0.28),transparent);
+}
+.logo{
+  font-family:'Cinzel',serif;font-size:20px;font-weight:700;letter-spacing:4px;
+  color:var(--gold);white-space:nowrap;
+}
+#site-logo{
+  font-family:'Cinzel',Georgia,serif !important;font-size:18px !important;font-weight:700 !important;
+  letter-spacing:2px !important;color:#7a5010 !important;white-space:nowrap !important;
+  cursor:pointer;flex-shrink:0;user-select:none;
+  opacity:1 !important;visibility:visible !important;display:block !important;
+}
+#logo-astro{
+  color:#7a5010 !important;font-weight:700 !important;
+  font-size:20px !important;letter-spacing:3px !important;
+  font-family:'Cinzel',Georgia,serif !important;
+}
+#logo-il{
+  color:#b8872a !important;font-weight:800 !important;
+  font-size:11px !important;letter-spacing:5px !important;
+  vertical-align:5px !important;
+  font-family:'Cinzel',Georgia,serif !important;
+  font-style:italic !important;
+  padding-left:7px !important;
+  margin-left:6px !important;
+  border-left:1px solid rgba(184,135,42,0.5) !important;
+}
+.logo-astro{color:#b07820}
+.logo-app{font-size:13px;font-weight:400;letter-spacing:5px;color:var(--gold-bright)}
+.logo-star{font-size:13px;color:var(--gold-bright);margin:0 3px}
+nav{display:flex;gap:3px;flex-wrap:wrap}
+nav a{
+  color:var(--text-dim);text-decoration:none;padding:7px 15px;border-radius:4px;
+  font-size:13px;border:1px solid transparent;transition:all .22s ease;cursor:pointer;
+}
+nav a:hover{color:var(--gold);border-color:rgba(160,118,38,0.28);background:rgba(160,118,38,0.06)}
+nav a.active{color:#fff;background:linear-gradient(135deg,var(--gold),var(--gold-bright));border-color:transparent;font-weight:700}
+
+/* ── BARS ── */
+.person-bar,.view-bar,.person2-bar{
+  position:relative;z-index:50;padding:11px 36px;
+  display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+}
+.person-bar{background:rgba(250,245,235,0.97);border-bottom:1px solid rgba(160,118,38,0.12)}
+.view-bar{background:rgba(245,240,228,0.97);border-bottom:1px solid rgba(160,118,38,0.12)}
+.person2-bar{background:rgba(252,244,240,0.97);border-bottom:1px solid rgba(180,80,60,0.15)}
+.person-bar input,.person-bar select,
+.view-bar input,.view-bar select,
+.person2-bar input,.person2-bar select{
+  background:#fff;border:1px solid rgba(160,118,38,0.28);
+  color:var(--text);padding:6px 11px;border-radius:5px;
+  font-size:13px;font-family:inherit;outline:none;transition:border-color .2s;
+}
+.person-bar input:focus,.view-bar input:focus,.person2-bar input:focus{border-color:var(--gold)}
+.person-bar label,.view-bar label,.person2-bar label{font-size:11px;color:var(--text-dim)}
+.pgroup{display:flex;align-items:center;gap:5px}
+.btn{
+  background:transparent;border:1px solid var(--gold);color:var(--gold);
+  padding:7px 20px;border-radius:4px;cursor:pointer;font-size:11px;
+  font-family:inherit;letter-spacing:1px;text-transform:uppercase;transition:all .2s ease;
+}
+.btn:hover{background:var(--gold);color:#fff;font-weight:700}
+.btn:active{transform:scale(0.97)}
+.tdate-nav{display:flex;gap:3px}
+.tdate-nav button{
+  background:rgba(160,118,38,0.07);border:1px solid rgba(160,118,38,0.22);
+  color:var(--gold);padding:5px 11px;border-radius:4px;cursor:pointer;
+  font-family:inherit;font-size:11px;transition:all .15s;
+}
+.tdate-nav button:hover{background:rgba(160,118,38,0.14);border-color:var(--gold)}
+
+/* ── MAIN ── */
+main{position:relative;z-index:10;display:flex;flex-wrap:wrap;padding:24px 36px;gap:22px;align-items:flex-start}
+.chart-wrap{position:relative;flex:0 0 auto}
+.chart-wrap::before{
+  content:'';position:absolute;inset:-14px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(ellipse at center,rgba(160,118,38,0.06) 0%,transparent 70%);
+}
+.chart-svg{display:block;filter:drop-shadow(0 4px 24px rgba(100,70,20,0.18)) drop-shadow(0 1px 6px rgba(100,70,20,0.1))}
+
+/* ── SIDE PANEL ── */
+.side-panel{flex:1;min-width:250px;display:flex;flex-direction:column;gap:12px}
+.reading-side-panel{
+  flex:1;min-width:260px;max-width:340px;
+  background:var(--card);border:1px solid var(--border-gold);
+  border-radius:10px;padding:16px;
+  box-shadow:0 1px 12px rgba(160,118,38,0.06);
+  overflow-y:auto;max-height:700px;
+}
+.reading-side-title{
+  font-family:'Cinzel',serif;font-size:11px;font-weight:600;
+  color:var(--gold);letter-spacing:2px;text-transform:uppercase;
+  border-bottom:1px solid rgba(160,118,38,0.14);
+  padding-bottom:10px;margin-bottom:12px;
+}
+.panel-card{
+  background:var(--card);border:1px solid var(--border-gold);
+  border-radius:10px;padding:15px;
+  box-shadow:0 1px 12px rgba(160,118,38,0.06);transition:border-color .3s,box-shadow .3s;
+}
+.panel-card:hover{border-color:rgba(160,118,38,0.36);box-shadow:0 2px 18px rgba(160,118,38,0.1)}
+.panel-card h3{
+  font-family:'Cinzel',serif;font-size:10px;color:var(--gold);
+  letter-spacing:2.5px;text-transform:uppercase;
+  margin-bottom:11px;padding-bottom:8px;border-bottom:1px solid rgba(160,118,38,0.14);
+}
+.planet-mini-list{display:flex;flex-direction:column;gap:2px;font-size:12px}
+.planet-mini-row{display:flex;align-items:center;gap:7px;padding:4px 7px;border-radius:5px;transition:background .14s}
+.planet-mini-row:hover{background:rgba(160,118,38,0.06)}
+.planet-glyph{font-size:15px;width:18px;text-align:center}
+.planet-name-s{color:var(--text);width:55px}
+.planet-pos{color:var(--gold);flex:1;font-weight:600}
+.planet-retro{color:#c03030;font-size:10px;font-weight:700}
+
+/* ── TABLES ── */
+.tables-section{position:relative;z-index:10;padding:0 36px 24px;display:flex;gap:14px;flex-wrap:wrap}
+.compare-wrap{display:flex;gap:14px;flex:1 1 100%;min-width:0}
+.data-table-wrap{
+  flex:1;min-width:270px;background:var(--card);
+  border:1px solid var(--border-gold);border-radius:10px;overflow:hidden;
+  box-shadow:0 1px 12px rgba(160,118,38,0.06);transition:border-color .3s;
+}
+.data-table-wrap:hover{border-color:rgba(160,118,38,0.34)}
+.table-title{
+  padding:11px 15px;font-family:'Cinzel',serif;font-size:10px;font-weight:600;
+  color:var(--gold);letter-spacing:2.5px;text-transform:uppercase;
+  border-bottom:1px solid rgba(160,118,38,0.14);background:rgba(160,118,38,0.04);
+}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{
+  background:rgba(160,118,38,0.06);color:var(--text-dim);padding:8px 12px;text-align:right;
+  font-weight:600;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;
+  border-bottom:1px solid rgba(160,118,38,0.12);
+}
+td{padding:7px 12px;border-bottom:1px solid rgba(160,118,38,0.08);color:var(--text);transition:background .13s}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(160,118,38,0.04)}
+.glyph-cell{font-size:16px;text-align:center;width:28px}
+.sign-glyph{font-size:13px}
+.retro{color:#c03030;font-size:10px;font-weight:700}
+.aspect-symbol{font-size:16px;text-align:center}
+.asp-conj{color:#6030b0}.asp-sex{color:#1868a8}.asp-sq{color:#b81818}
+.asp-tri{color:#186838}.asp-opp{color:#b84010}.asp-incon{color:#907010}
+.orb-pos{color:#187048}.orb-neg{color:#902828}
+
+/* ── READING ── */
+.reading-section{position:relative;z-index:10;padding:0 36px 36px}
+.reading-header{text-align:center;margin-bottom:22px;padding-top:4px}
+.reading-title{
+  font-family:'Cinzel',serif;font-size:22px;font-weight:700;
+  letter-spacing:6px;text-transform:uppercase;display:block;margin-bottom:6px;
+  background:linear-gradient(135deg,var(--gold) 0%,var(--gold-bright) 50%,var(--gold) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.reading-subtitle{font-size:12px;color:var(--text-dim);letter-spacing:1px}
+.reading-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+@media(max-width:800px){.reading-grid{grid-template-columns:1fr}}
+.reading-card{
+  background:var(--card);border:1px solid var(--border-gold);
+  border-radius:10px;padding:20px;
+  box-shadow:0 1px 12px rgba(160,118,38,0.06);transition:border-color .3s,transform .2s;
+}
+.reading-card:hover{border-color:rgba(160,118,38,0.34);transform:translateY(-1px)}
+.reading-card.full-width{grid-column:1/-1}
+.reading-card-title{
+  font-family:'Cinzel',serif;font-size:10px;font-weight:600;color:var(--gold);
+  letter-spacing:2.5px;text-transform:uppercase;
+  border-bottom:1px solid rgba(160,118,38,0.14);padding-bottom:10px;margin-bottom:14px;
+}
+.planet-reading-row{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(160,118,38,0.1);align-items:flex-start}
+.planet-reading-row:last-child{border-bottom:none}
+.pread-glyph{font-size:18px;width:24px;text-align:center;flex-shrink:0;margin-top:1px;font-family:serif}
+.pread-name{font-size:12px;font-weight:700;width:58px;flex-shrink:0}
+.pread-pos{font-size:12px;color:var(--gold);font-weight:600;width:76px;flex-shrink:0}
+.pread-text{font-size:12px;color:#5a4868;line-height:1.75;flex:1}
+.transit-reading-row{padding:10px 0;border-bottom:1px solid rgba(160,118,38,0.1)}
+.transit-reading-row:last-child{border-bottom:none}
+.transit-reading-header{display:flex;align-items:center;gap:7px;margin-bottom:5px;flex-wrap:wrap}
+.t-planet-badge{font-size:12px;padding:2px 9px;border-radius:3px;background:rgba(160,118,38,0.07);border:1px solid rgba(160,118,38,0.22)}
+.t-aspect-sym{font-size:16px}
+.t-natal-badge{font-size:12px;color:var(--text-dim)}
+.transit-reading-text{font-size:12px;color:#5a4868;line-height:1.75}
+.orb-indicator{font-size:11px;color:var(--text-dim)}
+.quality-badge{font-size:10px;padding:1px 8px;border-radius:10px;background:rgba(160,118,38,0.08);color:var(--text-dim);border:1px solid rgba(160,118,38,0.15);letter-spacing:0.5px}
+.general-reading-text{font-size:13px;color:#4a3858;line-height:2.05;text-align:right}
+.reading-paragraph{margin-bottom:14px;padding-right:14px;border-right:2px solid rgba(160,118,38,0.25)}
+.reading-highlight{color:var(--gold-bright);font-weight:700}
+
+/* ── FORECAST ── */
+.forecast-list{display:flex;flex-direction:column;gap:10px;max-width:820px;margin:0 auto}
+.forecast-event{
+  padding:14px 16px;border-radius:10px;
+  border:1px solid var(--border-gold);background:var(--card);
+  box-shadow:0 1px 10px rgba(160,118,38,0.06);transition:border-color .25s;
+}
+.forecast-event:hover{border-color:rgba(160,118,38,0.34)}
+.forecast-date{font-size:11px;color:var(--gold-bright);font-weight:700;margin-bottom:5px;letter-spacing:0.5px}
+.forecast-header{display:flex;align-items:center;gap:7px;margin-bottom:5px;flex-wrap:wrap}
+.forecast-text{font-size:12px;color:#5a4868;line-height:1.6}
+
+/* ── HOROSCOPE ── */
+.horo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.horo-card{
+  background:var(--card);border:1px solid var(--border-gold);
+  border-radius:10px;padding:15px;
+  box-shadow:0 1px 10px rgba(160,118,38,0.06);transition:border-color .25s;
+}
+.horo-card:hover{border-color:rgba(160,118,38,0.34)}
+.horo-user-sign{border-color:rgba(160,118,38,0.5)!important;box-shadow:0 0 18px rgba(160,118,38,0.12)!important}
+.horo-sign-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.horo-glyph{font-size:22px;font-family:serif}
+.horo-name{font-size:14px;font-weight:700;color:var(--text)}
+.horo-you-badge{font-size:10px;background:rgba(160,118,38,0.1);border:1px solid var(--gold);color:var(--gold);padding:1px 7px;border-radius:8px;margin-right:auto;letter-spacing:0.5px}
+.horo-energy{height:3px;background:rgba(160,118,38,0.12);border-radius:2px;margin-bottom:5px;overflow:hidden}
+.horo-energy-bar{height:100%;border-radius:2px}
+.horo-energy-label{font-size:10px;color:var(--text-dim);margin-bottom:7px}
+.horo-text{font-size:11px;color:#5a4868;line-height:1.65}
+
+/* ── FOOTER ── */
+footer{
+  position:relative;z-index:10;text-align:center;padding:22px;
+  font-size:10px;color:rgba(100,80,50,0.45);
+  border-top:1px solid rgba(160,118,38,0.1);letter-spacing:1.5px;
+}
+footer::before{content:'✦  ✦  ✦';display:block;color:rgba(160,118,38,0.28);margin-bottom:8px;letter-spacing:8px}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:rgba(160,118,38,0.2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(160,118,38,0.4)}
+
+/* ── PWA INSTALL ── */
+.btn-install{
+  background:linear-gradient(135deg,#2244bb,#4466dd);
+  border:none;color:#fff;padding:7px 14px;border-radius:4px;cursor:pointer;
+  font-size:11px;font-family:inherit;letter-spacing:.5px;gap:5px;
+  display:none;align-items:center;
+}
+.btn-install.visible{display:flex}
+
+/* ── DATE DISPLAY BUTTON ── */
+.date-btn{
+  background:#fff;border:1px solid rgba(160,118,38,0.28);color:var(--text);
+  padding:6px 12px;border-radius:5px;cursor:pointer;font-size:13px;
+  font-family:inherit;transition:border-color .2s;white-space:nowrap;
+  display:flex;align-items:center;gap:6px;
+}
+.date-btn:hover{border-color:var(--gold)}
+.date-btn::after{content:'▾';font-size:10px;color:var(--text-dim)}
+.time-inputs{display:flex;align-items:center;gap:4px}
+.time-inputs input{
+  width:46px;background:#fff;border:1px solid rgba(160,118,38,0.28);
+  color:var(--text);padding:6px 0;border-radius:5px;font-size:13px;
+  font-family:inherit;outline:none;text-align:center;transition:border-color .2s;
+}
+.time-inputs input:focus{border-color:var(--gold)}
+.time-sep{font-size:16px;font-weight:700;color:var(--text-dim);margin:0 1px}
+
+/* ── DRUM PICKER ── */
+.drum-modal{
+  background:#fff;border-radius:16px;width:310px;max-width:94vw;
+  box-shadow:0 20px 60px rgba(0,0,0,0.18);border:1px solid var(--border-gold);
+  overflow:hidden;animation:slideUp .28s ease;
+}
+.drum-title{
+  padding:14px 20px;font-family:'Cinzel',serif;font-size:11px;color:var(--gold);
+  letter-spacing:2px;text-transform:uppercase;text-align:center;
+  border-bottom:1px solid var(--border-gold);background:rgba(160,118,38,0.03);
+}
+.drum-container{
+  display:flex;height:200px;position:relative;
+  background:linear-gradient(to bottom,#fff 0%,transparent 30%,transparent 70%,#fff 100%);
+}
+.drum-container::before,.drum-container::after{
+  content:'';position:absolute;left:0;right:0;height:80px;z-index:10;pointer-events:none;
+}
+.drum-container::before{top:0;background:linear-gradient(to bottom,rgba(255,255,255,0.95),transparent)}
+.drum-container::after{bottom:0;background:linear-gradient(to top,rgba(255,255,255,0.95),transparent)}
+.drum-selection{
+  position:absolute;left:10px;right:10px;top:80px;height:40px;z-index:5;pointer-events:none;
+  border-top:1.5px solid rgba(160,118,38,0.35);border-bottom:1.5px solid rgba(160,118,38,0.35);
+  background:rgba(160,118,38,0.05);border-radius:4px;
+}
+.drum-col{
+  flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+.drum-col::-webkit-scrollbar{display:none}
+.drum-pad{height:80px;flex-shrink:0}
+.drum-item{
+  height:40px;display:flex;align-items:center;justify-content:center;
+  scroll-snap-align:center;font-size:14px;color:#bbb;cursor:pointer;
+  transition:color .15s,font-size .15s;
+}
+.drum-item.sel{color:var(--text);font-size:17px;font-weight:700}
+.drum-divider{width:1px;background:rgba(160,118,38,0.15);margin:10px 0;flex-shrink:0}
+.drum-footer{
+  padding:12px 16px;border-top:1px solid var(--border-gold);
+  display:flex;gap:8px;background:rgba(160,118,38,0.03);
+}
+.drum-footer button{flex:1;padding:10px;border-radius:6px;cursor:pointer;
+  font-size:13px;font-family:inherit;font-weight:600;transition:all .15s}
+.drum-cancel{background:#fff;border:1px solid var(--border-gold);color:var(--text-dim)}
+.drum-cancel:hover{border-color:var(--gold);color:var(--text)}
+.drum-confirm{background:linear-gradient(135deg,var(--gold),var(--gold-bright));border:none;color:#fff}
+.drum-confirm:hover{opacity:.9}
+
+/* ── SUBSCRIPTION VIEW ── */
+.sub-wrap{position:relative;z-index:10;padding:28px 36px 44px;max-width:900px;margin:0 auto}
+.sub-header{text-align:center;margin-bottom:30px}
+.sub-title{font-family:'Cinzel',serif;font-size:22px;font-weight:700;letter-spacing:5px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-bright),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;display:block}
+.sub-subtitle{font-size:13px;color:var(--text-dim)}
+
+/* סטטוס מנוי */
+.sub-status-card{
+  background:var(--card);border:1px solid var(--border-gold);border-radius:12px;
+  padding:24px 28px;margin-bottom:28px;
+  box-shadow:0 2px 16px rgba(160,118,38,0.08);
+}
+.sub-status-row{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.sub-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 16px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.8px;
+}
+.sub-badge-active{background:rgba(40,160,80,0.12);color:#1a8040;border:1px solid rgba(40,160,80,0.3)}
+.sub-badge-trial{background:rgba(160,118,38,0.1);color:var(--gold);border:1px solid var(--border-gold)}
+.sub-badge-inactive{background:rgba(180,40,40,0.1);color:#a02020;border:1px solid rgba(180,40,40,0.2)}
+.sub-details-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:16px}
+.sub-detail{background:rgba(160,118,38,0.04);border-radius:8px;padding:12px 14px;border:1px solid rgba(160,118,38,0.1)}
+.sub-detail-label{font-size:10px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.sub-detail-value{font-size:14px;font-weight:600;color:var(--text)}
+.sub-cancel-note{font-size:12px;color:var(--text-dim);padding:10px 0;border-top:1px solid var(--border-gold);margin-top:4px}
+.sub-cancel-note a{color:var(--gold);text-decoration:none}
+.sub-cancel-note a:hover{text-decoration:underline}
+
+/* כרטיסי תוכניות */
+.plans-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-bottom:28px}
+.plan-card{
+  background:var(--card);border:1.5px solid var(--border-gold);
+  border-radius:12px;padding:24px 20px;text-align:center;
+  transition:all .25s;position:relative;overflow:hidden;
+}
+.plan-card:hover{border-color:rgba(160,118,38,0.5);transform:translateY(-2px);box-shadow:0 6px 24px rgba(160,118,38,0.1)}
+.plan-card.recommended{border-color:var(--gold);box-shadow:0 0 0 2px rgba(160,118,38,0.15)}
+.plan-rec-badge{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,var(--gold),var(--gold-bright));
+  color:#fff;font-size:10px;font-weight:700;letter-spacing:1px;
+  padding:3px 16px;border-radius:0 0 8px 8px;
+}
+.plan-name{font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--gold);
+  letter-spacing:2px;margin-bottom:8px;margin-top:10px}
+.plan-price{font-size:32px;font-weight:700;color:var(--text);margin:10px 0 4px}
+.plan-price span{font-size:14px;color:var(--text-dim);font-weight:400}
+.plan-period{font-size:12px;color:var(--text-dim);margin-bottom:14px}
+.plan-features{list-style:none;padding:0;margin:0 0 18px;text-align:right}
+.plan-features li{font-size:12px;color:var(--text);padding:5px 0;border-bottom:1px solid rgba(160,118,38,0.08);display:flex;align-items:center;gap:7px}
+.plan-features li:last-child{border-bottom:none}
+.plan-features li::before{content:'✓';color:var(--gold);font-weight:700;flex-shrink:0}
+.btn-plan{
+  width:100%;padding:10px;border-radius:6px;cursor:pointer;
+  font-size:13px;font-family:inherit;font-weight:700;transition:all .2s;border:none;
+}
+.btn-plan-outline{background:transparent;border:1.5px solid var(--gold)!important;color:var(--gold)}
+.btn-plan-outline:hover{background:var(--gold);color:#fff}
+.btn-plan-fill{background:linear-gradient(135deg,var(--gold),var(--gold-bright));color:#fff}
+.btn-plan-fill:hover{opacity:.9}
+
+/* ── LEGEND (מקרא) ── */
+.legend-box{
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;
+  background:rgba(160,118,38,0.04);
+  border:1px solid var(--border-gold);border-radius:8px;
+  padding:10px 16px;margin-bottom:20px;
+}
+.legend-title{
+  font-family:'Cinzel',serif;font-size:9px;color:var(--text-dim);
+  letter-spacing:2px;text-transform:uppercase;margin-left:6px;flex-shrink:0;
+}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text)}
+.legend-swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.legend-bar{width:4px;height:20px;border-radius:2px;flex-shrink:0}
+
+/* ── ENTRANCE ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+header{animation:fadeUp .5s ease both}
+.person-bar{animation:fadeUp .5s .08s ease both}
+.view-bar{animation:fadeUp .5s .14s ease both}
+main{animation:fadeUp .6s .2s ease both}
+.tables-section{animation:fadeUp .6s .28s ease both}
+.reading-section{animation:fadeUp .6s .36s ease both}
+
+/* ── USER AREA (header) ── */
+.user-area{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.btn-login{
+  background:linear-gradient(135deg,var(--gold),var(--gold-bright));
+  border:none;color:#fff;padding:7px 18px;border-radius:4px;cursor:pointer;
+  font-size:12px;font-family:inherit;letter-spacing:.8px;font-weight:600;transition:opacity .2s;
+}
+.btn-login:hover{opacity:.88}
+.user-badge{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(160,118,38,0.08);border:1px solid var(--border-gold);
+  border-radius:20px;padding:5px 14px 5px 8px;
+}
+.user-avatar{
+  width:30px;height:30px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),var(--gold-bright));
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.user-name{font-size:12px;color:var(--text);font-weight:600}
+.user-sub{font-size:10px;color:var(--text-dim)}
+.btn-sm{
+  background:transparent;border:1px solid var(--border-gold);color:var(--gold);
+  padding:4px 12px;border-radius:4px;cursor:pointer;font-size:11px;
+  font-family:inherit;letter-spacing:.5px;transition:all .15s;
+}
+.btn-sm:hover{background:var(--gold);color:#fff}
+.btn-sm-ghost{
+  background:transparent;border:none;color:var(--text-dim);
+  padding:4px 8px;border-radius:4px;cursor:pointer;font-size:11px;
+  font-family:inherit;transition:color .15s;
+}
+.btn-sm-ghost:hover{color:var(--text)}
+
+/* ── MODAL ── */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.modal-overlay{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,0.35);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;
+  animation:fadeIn .25s ease;
+}
+.modal{
+  background:#fff;border-radius:16px;padding:36px 40px;
+  width:420px;max-width:92vw;
+  box-shadow:0 20px 60px rgba(0,0,0,0.18);
+  border:1px solid var(--border-gold);
+  animation:slideUp .3s ease;
+  direction:rtl;
+}
+.modal-title{
+  font-family:'Cinzel',serif;font-size:18px;font-weight:700;
+  color:var(--gold);letter-spacing:2px;margin-bottom:6px;text-align:center;
+}
+.modal-sub{font-size:12px;color:var(--text-dim);text-align:center;margin-bottom:24px}
+.modal-tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:2px solid rgba(160,118,38,0.15)}
+.modal-tab{
+  flex:1;padding:8px;font-size:13px;cursor:pointer;text-align:center;
+  color:var(--text-dim);border-bottom:2px solid transparent;margin-bottom:-2px;
+  transition:all .2s;font-family:inherit;background:none;border-top:none;border-right:none;border-left:none;
+}
+.modal-tab.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:700}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:11px;color:var(--text-dim);margin-bottom:5px;letter-spacing:.5px}
+.form-group input,.form-group select{
+  width:100%;background:#fafaf8;border:1px solid rgba(160,118,38,0.28);
+  color:var(--text);padding:9px 12px;border-radius:6px;
+  font-size:13px;font-family:inherit;outline:none;transition:border-color .2s;
+}
+.form-group input:focus,.form-group select:focus{border-color:var(--gold)}
+.form-row{display:flex;gap:10px}
+.form-row .form-group{flex:1}
+.btn-primary{
+  width:100%;background:linear-gradient(135deg,var(--gold),var(--gold-bright));
+  border:none;color:#fff;padding:11px;border-radius:6px;
+  cursor:pointer;font-size:13px;font-family:inherit;font-weight:700;
+  letter-spacing:.8px;transition:opacity .2s;margin-top:6px;
+}
+.btn-primary:hover{opacity:.9}
+.btn-google{
+  width:100%;background:#fff;border:1.5px solid #ddd;color:#444;
+  padding:10px;border-radius:6px;cursor:pointer;font-size:13px;
+  font-family:inherit;display:flex;align-items:center;justify-content:center;
+  gap:10px;margin-top:10px;transition:background .2s;
+}
+.btn-google:hover{background:#f5f5f5}
+.modal-divider{text-align:center;font-size:11px;color:#aaa;margin:12px 0;position:relative}
+.modal-divider::before,.modal-divider::after{
+  content:'';position:absolute;top:50%;width:42%;height:1px;background:#eee;
+}
+.modal-divider::before{right:0}.modal-divider::after{left:0}
+.modal-close{
+  position:absolute;top:14px;left:14px;background:none;border:none;
+  font-size:20px;cursor:pointer;color:#aaa;line-height:1;
+}
+.modal-close:hover{color:#666}
+.modal-inner{position:relative}
+.plan-badge{
+  display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;
+  font-weight:700;letter-spacing:1px;text-transform:uppercase;
+}
+.plan-free{background:rgba(160,118,38,0.1);color:var(--gold);border:1px solid var(--border-gold)}
+.plan-pro{background:linear-gradient(135deg,#7b2ff7,#b06aff);color:#fff}
+
+/* ── PROFILES PANEL ── */
+@keyframes slideIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+.profiles-panel{
+  position:fixed;top:0;right:0;bottom:0;width:340px;z-index:500;
+  background:#fff;border-left:1px solid var(--border-gold);
+  box-shadow:-4px 0 24px rgba(0,0,0,0.1);
+  display:flex;flex-direction:column;
+  animation:slideIn .3s ease;
+  direction:rtl;
+}
+.profiles-panel-header{
+  padding:20px 20px 16px;
+  border-bottom:1px solid var(--border-gold);
+  background:rgba(160,118,38,0.04);
+}
+.profiles-panel-title{
+  font-family:'Cinzel',serif;font-size:14px;color:var(--gold);
+  letter-spacing:1.5px;font-weight:700;margin-bottom:2px;
+}
+.profiles-panel-sub{font-size:11px;color:var(--text-dim)}
+.profiles-list{flex:1;overflow-y:auto;padding:12px}
+.profile-card{
+  background:#fafaf8;border:1px solid var(--border-gold);
+  border-radius:10px;padding:13px 15px;margin-bottom:10px;cursor:pointer;
+  transition:all .2s;position:relative;
+}
+.profile-card:hover{border-color:var(--gold);background:rgba(160,118,38,0.04);transform:translateX(-2px)}
+.profile-card.active-profile{border-color:var(--gold);background:rgba(160,118,38,0.06);border-width:1.5px}
+.profile-card-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px}
+.profile-card-info{font-size:11px;color:var(--text-dim);line-height:1.6}
+.profile-card-del{
+  position:absolute;top:10px;left:10px;background:none;border:none;
+  font-size:15px;color:#ccc;cursor:pointer;line-height:1;transition:color .15s;
+}
+.profile-card-del:hover{color:#cc3333}
+.add-profile-btn{
+  margin:0 12px 12px;padding:11px;border-radius:8px;
+  background:transparent;border:1.5px dashed rgba(160,118,38,0.35);
+  color:var(--gold);font-size:13px;cursor:pointer;font-family:inherit;
+  transition:all .2s;text-align:center;width:calc(100% - 24px);
+}
+.add-profile-btn:hover{background:rgba(160,118,38,0.05);border-color:var(--gold)}
+.profiles-panel-close{
+  position:absolute;top:16px;left:16px;background:none;border:none;
+  font-size:20px;cursor:pointer;color:var(--text-dim);
+}
+.profiles-panel-close:hover{color:var(--text)}
+.profile-count{
+  font-size:10px;background:rgba(160,118,38,0.12);color:var(--gold);
+  padding:2px 8px;border-radius:10px;font-weight:600;
+}
+
+/* ══════════════════════════════════════════════
+   MOBILE — עד 640px
+══════════════════════════════════════════════ */
+
+/* toggle לידה — נראה רק במובייל */
+.mobile-bar-toggle{display:none}
+
+@media(max-width:640px){
+
+  /* ── Header ── */
+  header{padding:0 14px;height:56px;flex-wrap:nowrap;justify-content:flex-end}
+  #site-logo{
+    position:absolute !important;left:14px !important;top:50% !important;
+    transform:translateY(-50%) !important;
+    font-size:16px !important;letter-spacing:1px !important;
+    z-index:200 !important;
+    color:#7a5010 !important;opacity:1 !important;visibility:visible !important;
+  }
+  .logo{font-size:16px;letter-spacing:3px}
+  .logo-app{font-size:11px;letter-spacing:4px}
+  nav{display:none}
+  .btn-install{display:none!important}
+  .btn-login{padding:7px 14px;font-size:13px;min-height:40px}
+  .user-badge{padding:5px 12px 5px 8px}
+  .user-name{font-size:13px}
+  .user-sub{display:none}
+  .btn-sm{padding:6px 12px;font-size:12px;min-height:38px}
+
+  /* ── Bottom nav ── */
+  .mobile-nav{
+    display:flex;
+    position:fixed;bottom:0;left:0;right:0;z-index:300;
+    background:rgba(255,252,247,0.98);
+    border-top:1px solid var(--border-gold);
+    box-shadow:0 -2px 16px rgba(160,118,38,0.1);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  .mobile-nav-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:3px;padding:10px 2px;
+    cursor:pointer;border:none;background:none;
+    color:var(--text-dim);font-size:11px;font-family:inherit;
+    transition:color .18s;-webkit-tap-highlight-color:transparent;
+  }
+  .mobile-nav-item.active{color:var(--gold)}
+  .mobile-nav-icon{font-size:22px;line-height:1}
+
+  /* ── Toggle לנתוני לידה ── */
+  .mobile-bar-toggle{
+    display:flex;align-items:center;gap:10px;
+    padding:14px 16px;cursor:pointer;
+    background:rgba(250,245,235,0.97);
+    border-bottom:1px solid rgba(160,118,38,0.12);
+    font-size:15px;font-weight:700;color:var(--gold);
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+  }
+  .mobile-bar-toggle-arrow{
+    margin-right:auto;font-size:13px;
+    color:var(--text-dim);transition:transform .25s;
+  }
+  .mobile-bar-toggle-arrow.open{transform:rotate(180deg)}
+
+  /* ── Person bar — מתקפל ── */
+  .person-bar{
+    flex-wrap:wrap;gap:14px;
+    padding:0 16px;
+    max-height:0;overflow:hidden;
+    border-bottom:none;
+    transition:max-height .35s ease,padding .35s ease;
+  }
+  .person-bar.expanded{
+    max-height:600px;padding:16px 16px;
+    border-bottom:1px solid rgba(160,118,38,0.12);
+  }
+  .person-bar b{font-size:15px;width:100%}
+  .pgroup{display:flex;flex-direction:column;gap:5px;flex:1;min-width:120px}
+  .pgroup label{font-size:13px;color:var(--text-dim)}
+  .person-bar input,.person-bar select{
+    font-size:16px;padding:10px 12px;min-height:46px;width:100%;
+  }
+  .date-btn{min-height:46px;font-size:15px;padding:10px 14px;width:100%}
+  .time-inputs{gap:6px}
+  .time-inputs input{min-height:46px;font-size:16px;width:52px}
+  .person-bar .btn{
+    width:100%;padding:12px;font-size:15px;min-height:48px;margin-top:4px;
+  }
+
+  /* ── View bar ── */
+  .view-bar{
+    padding:14px 16px;gap:12px;flex-wrap:wrap;
+  }
+  .view-bar label{font-size:15px;font-weight:700;color:var(--gold);width:100%}
+  .view-bar input,.view-bar select{
+    font-size:16px;padding:10px 12px;min-height:46px;
+  }
+  .view-bar .date-btn{min-height:46px;font-size:15px}
+  .tdate-nav{gap:6px;flex-wrap:wrap}
+  .tdate-nav button{
+    padding:10px 16px;min-height:46px;font-size:14px;flex:1;
+  }
+  .view-bar .btn{min-height:46px;font-size:14px}
+  #sunInfo{font-size:15px;width:100%;text-align:center}
+
+  /* ── Person2 bar (synastry) ── */
+  .person2-bar{
+    padding:14px 16px;gap:14px;flex-wrap:wrap;
+  }
+  .person2-bar input,.person2-bar select{
+    font-size:16px;padding:10px 12px;min-height:46px;
+  }
+
+  /* ── Main — מפה מלאת רוחב ── */
+  main{padding:12px;gap:16px;flex-direction:column;align-items:center}
+  .chart-wrap{width:100%;display:flex;justify-content:center}
+  #astroChart{
+    width:calc(100vw - 24px)!important;
+    height:calc(100vw - 24px)!important;
+    max-width:420px!important;
+    max-height:420px!important;
+  }
+  .side-panel{min-width:unset;width:100%}
+  .reading-side-panel{max-width:unset;max-height:none;width:100%}
+  .panel-card{padding:16px}
+  .panel-card h3{font-size:13px;margin-bottom:14px}
+  .planet-mini-list{gap:4px}
+  .planet-mini-row{padding:9px 10px}
+  .planet-glyph{font-size:22px;width:26px}
+  .planet-name-s{font-size:15px;width:auto;min-width:64px}
+  .planet-pos{font-size:15px}
+  .planet-retro{font-size:13px}
+
+  /* ── Tables ── */
+  .tables-section{padding:0 12px 12px;flex-direction:column;gap:12px}
+  .compare-wrap{gap:8px}
+  .compare-wrap .data-table-wrap{flex:1;min-width:0;overflow-x:auto}
+  .data-table-wrap{min-width:unset!important;overflow-x:auto}
+  .table-title{font-size:11px;padding:10px 10px;letter-spacing:1px}
+  table{font-size:12px}
+  th{font-size:10px;padding:7px 6px}
+  td{padding:7px 6px}
+  .glyph-cell{font-size:20px;width:32px}
+  .sign-glyph{font-size:16px}
+  .aspect-symbol{font-size:20px}
+
+  /* ── Reading ── */
+  .reading-section{padding:0 12px 88px}
+  .reading-grid{grid-template-columns:1fr;gap:12px}
+  .reading-card{padding:18px 16px}
+  .reading-card.full-width{grid-column:1}
+  .reading-title{font-size:20px;letter-spacing:4px}
+  .reading-card-title{font-size:12px}
+  .planet-reading-row{gap:10px}
+  .pread-glyph{font-size:22px}
+  .pread-name{font-size:15px;min-width:62px;width:auto}
+  .pread-pos{font-size:14px;width:auto;min-width:78px}
+  .pread-text{font-size:14px;line-height:1.85}
+  .transit-reading-text{font-size:14px;line-height:1.85}
+  .general-reading-text{font-size:15px;line-height:2.1}
+  .t-planet-badge{font-size:14px;padding:4px 12px}
+  .t-natal-badge{font-size:13px}
+
+  /* ── Forecast ── */
+  .forecast-list{padding:0 12px 88px;gap:14px}
+  .forecast-event{padding:16px}
+  .forecast-date{font-size:13px}
+  .forecast-text{font-size:14px;line-height:1.75}
+
+  /* ── Horoscope ── */
+  .horo-grid{padding:12px 12px 88px;gap:12px}
+  .horo-card{padding:16px}
+  .horo-glyph{font-size:26px}
+  .horo-name{font-size:16px}
+  .horo-text{font-size:13px;line-height:1.8}
+
+  /* ── Subscription ── */
+  .sub-wrap{padding:16px 12px 88px}
+  .sub-title{font-size:18px}
+  .plans-grid{grid-template-columns:1fr}
+  .plan-price{font-size:28px}
+
+  /* ── Legend ── */
+  .legend-box{padding:10px 14px;gap:8px}
+
+  /* ── Footer ── */
+  footer{padding-bottom:88px;font-size:11px}
+
+  /* ── Modals ── */
+  .modal{padding:26px 18px}
+  .modal-title{font-size:16px}
+  .form-group label{font-size:13px}
+  .form-group input,.form-group select{
+    font-size:16px;padding:11px 12px;min-height:46px;
+  }
+  .btn-primary{padding:14px;font-size:15px;min-height:50px}
+  .btn-google{padding:13px;font-size:14px;min-height:50px}
+  .modal-tab{font-size:15px;padding:10px}
+
+  /* ── Drum picker ── */
+  .drum-modal{width:98vw}
+  .drum-container{height:220px}
+  .drum-pad{height:88px}
+  .drum-selection{top:88px;height:44px}
+  .drum-item{height:44px;font-size:16px}
+  .drum-item.sel{font-size:21px}
+  .drum-footer button{font-size:14px;padding:12px}
+}
+
+/* Desktop — הסתר mobile nav + toggle */
+@media(min-width:641px){
+  .mobile-nav{display:none}
+  .mobile-bar-toggle{display:none}
+}
+
+/* ─── UX & VISUAL ENHANCEMENTS ─────────────────────────────────────── */
+
+/* Remove 300ms tap delay */
+button,a,input,select,textarea,[role="button"]{touch-action:manipulation}
+
+/* Prevent accidental pull-to-refresh on mobile */
+body{overscroll-behavior-y:contain}
+
+/* Keyboard focus ring — gold, keyboard-only */
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px}
+
+/* Desktop nav — 44px minimum touch target */
+nav a{min-height:44px;display:inline-flex;align-items:center}
+
+/* Mobile nav — gold top indicator on active item */
+.mobile-nav-item{position:relative}
+.mobile-nav-item.active::before{
+  content:'';position:absolute;top:0;right:18%;left:18%;height:2.5px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  border-radius:0 0 4px 4px;
+}
+
+/* Logo shimmer */
+@keyframes goldShimmer{
+  0%{background-position:200% center}
+  100%{background-position:-200% center}
+}
+#logo-astro{
+  background:linear-gradient(90deg,#7a5010 20%,#c8921a 42%,#f0c84a 50%,#c8921a 58%,#7a5010 80%)!important;
+  background-size:200% auto!important;
+  -webkit-background-clip:text!important;background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+  animation:goldShimmer 6s linear infinite;
+}
+
+/* Card entrance */
+@keyframes fadeCardUp{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.panel-card,.reading-card,.horo-card,.forecast-event,.plan-card{
+  animation:fadeCardUp .3s ease both;
+}
+
+/* Card hover — deeper gold glow */
+.reading-card:hover{
+  box-shadow:0 6px 24px rgba(160,118,38,0.14)!important;
+  border-color:rgba(160,118,38,0.38)!important;
+}
+.horo-card:hover,.forecast-event:hover,.plan-card:hover{
+  box-shadow:0 4px 18px rgba(160,118,38,0.1)!important;
+}
+
+/* Table row hover */
+tr:hover td{background:rgba(160,118,38,0.04)}
+
+/* Planet mini-row — pointer */
+.planet-mini-row{cursor:default}
+
+/* Primary button — subtle glow on hover */
+.btn:hover{box-shadow:0 2px 12px rgba(160,118,38,0.22)}
+
+/* Gold separator — reading paragraphs */
+.reading-paragraph{
+  border-right-width:3px!important;
+  border-image:linear-gradient(180deg,var(--gold-bright),rgba(160,118,38,0.2)) 1!important;
+}
+
+/* Prefers-reduced-motion — disable ALL animations */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important;
+  }
+}
+</style>
+<script src="astronomy.min.js"></script>
+</head>
+<body>
+<canvas class="stars" id="stars"></canvas>
+
+<header dir="ltr">
+  <div id="site-logo" onclick="switchView('transit')">✦ <span id="logo-astro">ASTRO</span><span id="logo-il">IL</span></div>
+  <nav>
+    <a data-view="transit" onclick="switchView('transit')" class="active">מפת מעברים</a>
+    <a data-view="natal"   onclick="switchView('natal')">מפת לידה</a>
+    <a data-view="synastry" onclick="switchView('synastry')">השוואת מפות</a>
+    <a data-view="forecast" onclick="switchView('forecast')">תחזית אישית</a>
+    <a data-view="horoscope" onclick="switchView('horoscope')">הורוסקופ יומי</a>
+    <a data-view="subscription" onclick="switchView('subscription')">ניהול מנוי</a>
+  </nav>
+  <div class="user-area">
+    <button class="btn-install" id="installBtn" onclick="installPWA()" title="הוסף למסך הבית">📱 הוסף לטלפון</button>
+    <button class="btn-login" id="loginBtn" onclick="openAuthModal()">כניסה / הרשמה</button>
+    <div id="userBadge" style="display:none" class="user-badge">
+      <div class="user-avatar" id="userAvatar"></div>
+      <div>
+        <div class="user-name" id="userDisplayName"></div>
+        <div class="user-sub" id="userPlanLabel"></div>
+      </div>
+      <button class="btn-sm" onclick="openProfiles()">המפות שלי <span id="profileCountBadge"></span></button>
+      <button class="btn-sm-ghost" onclick="logout()" title="יציאה">✕</button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ MOBILE BOTTOM NAV ═══ -->
+<nav class="mobile-nav" id="mobileNav">
+  <button class="mobile-nav-item active" data-view="transit" onclick="switchView('transit')">
+    <span class="mobile-nav-icon">☿</span>מעברים
+  </button>
+  <button class="mobile-nav-item" data-view="natal" onclick="switchView('natal')">
+    <span class="mobile-nav-icon">☉</span>לידה
+  </button>
+  <button class="mobile-nav-item" data-view="synastry" onclick="switchView('synastry')">
+    <span class="mobile-nav-icon">♎</span>השוואה
+  </button>
+  <button class="mobile-nav-item" data-view="forecast" onclick="switchView('forecast')">
+    <span class="mobile-nav-icon">◎</span>תחזית
+  </button>
+  <button class="mobile-nav-item" data-view="horoscope" onclick="switchView('horoscope')">
+    <span class="mobile-nav-icon">♈</span>הורוסקופ
+  </button>
+</nav>
+
+<!-- ═══ AUTH MODAL ═══ -->
+<div id="authModal" class="modal-overlay" style="display:none" onclick="closeAuthIfBg(event)">
+  <div class="modal modal-inner">
+    <button class="modal-close" onclick="closeAuthModal()">×</button>
+    <div class="modal-title">✦ אסטרולוגיה מקצועית ✦</div>
+    <div class="modal-sub">מנוי פרמיום — עד 15 מפות לידה אישיות</div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tab-login" onclick="switchTab('login')">כניסה</button>
+      <button class="modal-tab" id="tab-register" onclick="switchTab('register')">הרשמה</button>
+    </div>
+
+    <!-- Login -->
+    <div id="pane-login">
+      <div class="form-group"><label>אימייל</label><input type="email" id="loginEmail" placeholder="your@gmail.com"></div>
+      <div class="form-group"><label>סיסמה</label><input type="password" id="loginPass" placeholder="••••••••"></div>
+      <div id="loginError" style="color:#c03030;font-size:12px;margin-bottom:8px;display:none"></div>
+      <button class="btn-primary" onclick="doLogin()">כניסה</button>
+      <div class="modal-divider">או</div>
+      <button class="btn-google" onclick="doGoogleLogin()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+        כניסה עם Google
+      </button>
+    </div>
+
+    <!-- Register -->
+    <div id="pane-register" style="display:none">
+      <div class="form-row">
+        <div class="form-group"><label>שם פרטי</label><input type="text" id="regFirst" placeholder="רעות"></div>
+        <div class="form-group"><label>שם משפחה</label><input type="text" id="regLast" placeholder="בנודיס"></div>
+      </div>
+      <div class="form-group"><label>אימייל</label><input type="email" id="regEmail" placeholder="your@gmail.com"></div>
+      <div class="form-group"><label>סיסמה</label><input type="password" id="regPass" placeholder="6+ תווים"></div>
+      <div id="regError" style="color:#c03030;font-size:12px;margin-bottom:8px;display:none"></div>
+      <button class="btn-primary" onclick="doRegister()">הרשמה — התחל מנוי חינם</button>
+      <div class="modal-divider">או</div>
+      <button class="btn-google" onclick="doGoogleLogin()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+        הרשמה עם Google
+      </button>
+      <p style="font-size:10px;color:#aaa;text-align:center;margin-top:14px">מנוי חינם: עד 15 מפות · ללא כרטיס אשראי</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADD PROFILE MODAL ═══ -->
+<div id="addProfileModal" class="modal-overlay" style="display:none" onclick="closeAddProfileIfBg(event)">
+  <div class="modal modal-inner">
+    <button class="modal-close" onclick="closeAddProfileModal()">×</button>
+    <div class="modal-title" style="margin-bottom:4px">הוספת מפת לידה</div>
+    <div class="modal-sub" style="margin-bottom:20px">שמירת נתוני לידה לשימוש חוזר</div>
+    <div class="form-row">
+      <div class="form-group"><label>שם פרטי *</label><input type="text" id="pFirst" placeholder="רעות"></div>
+      <div class="form-group"><label>שם משפחה</label><input type="text" id="pLast" placeholder="בנודיס"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>יום</label><input type="number" id="pDay" min="1" max="31" placeholder="19"></div>
+      <div class="form-group"><label>חודש</label>
+        <select id="pMonth">
+          <option value="1">ינואר</option><option value="2">פברואר</option><option value="3">מרץ</option>
+          <option value="4">אפריל</option><option value="5">מאי</option><option value="6">יוני</option>
+          <option value="7">יולי</option><option value="8">אוגוסט</option><option value="9">ספטמבר</option>
+          <option value="10">אוקטובר</option><option value="11">נובמבר</option><option value="12">דצמבר</option>
+        </select>
+      </div>
+      <div class="form-group"><label>שנה</label><input type="number" id="pYear" min="1900" max="2100" placeholder="1977"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>שעה</label><input type="time" id="pTime" value="12:00"></div>
+      <div class="form-group"><label>עיר לידה</label>
+        <input type="text" id="pCity" placeholder="חיפה" list="cityList" oninput="onCityInput()">
+        <datalist id="cityList"></datalist>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>קו רוחב</label><input type="number" id="pLat" step="0.01" placeholder="32.82"></div>
+      <div class="form-group"><label>קו אורך</label><input type="number" id="pLon" step="0.01" placeholder="35.00"></div>
+    </div>
+    <div id="addProfileError" style="color:#c03030;font-size:12px;margin-bottom:8px;display:none"></div>
+    <button class="btn-primary" onclick="saveProfile()">שמור מפה</button>
+  </div>
+</div>
+
+<!-- ═══ PROFILES PANEL ═══ -->
+<div id="profilesPanel" class="profiles-panel" style="display:none">
+  <button class="profiles-panel-close" onclick="closeProfiles()">×</button>
+  <div class="profiles-panel-header">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div class="profiles-panel-title">המפות שלי</div>
+      <span class="profile-count" id="profileCountLabel"></span>
+    </div>
+    <div class="profiles-panel-sub">לחץ על מפה לטעינה · עד 15 מפות</div>
+  </div>
+  <div class="profiles-list" id="profilesList"></div>
+  <button class="add-profile-btn" id="addProfileBtnPanel" onclick="openAddProfileModal()">＋ הוסף מפה חדשה</button>
+</div>
+
+<div class="mobile-bar-toggle" onclick="togglePersonBar()">
+  ☉ נתוני לידה
+  <span class="mobile-bar-toggle-arrow" id="barArrow">▾</span>
+</div>
+
+<div class="person-bar" id="personBar">
+  <b style="color:#9a7020;font-size:13px">☉ נתוני לידה:</b>
+  <div class="pgroup">
+    <label>תאריך</label>
+    <button class="date-btn" id="bDateDisplay" onclick="openDrum('b')">15 ינואר 1990</button>
+    <input type="hidden" id="bDay" value="15">
+    <input type="hidden" id="bMonth" value="1">
+    <input type="hidden" id="bYear" value="1990">
+  </div>
+  <div class="pgroup">
+    <label>שעה</label>
+    <div class="time-inputs">
+      <input type="number" id="bHour" value="12" min="0" max="23" placeholder="12">
+      <span class="time-sep">:</span>
+      <input type="number" id="bMin" value="0" min="0" max="59" placeholder="00">
+    </div>
+  </div>
+  <div class="pgroup">
+    <label title="אופסט UTC לפי מקום הלידה">UTC</label>
+    <select id="bUtc" style="width:70px">
+      <option value="2" selected>+2</option>
+      <option value="3">+3</option>
+      <option value="1">+1</option>
+      <option value="0">+0</option>
+      <option value="-5">-5</option>
+      <option value="-8">-8</option>
+    </select>
+  </div>
+  <div class="pgroup"><label>קו רוחב</label><input type="number" id="bLat" value="32.82" step="0.01" style="width:80px"></div>
+  <div class="pgroup"><label>קו אורך</label><input type="number" id="bLon" value="35.00" step="0.01" style="width:80px"></div>
+  <div class="pgroup"><label>מערכת בתים</label>
+    <select id="hSys" onchange="recalc()">
+      <option value="placidus">פלאסידוס</option>
+      <option value="equal">שווי</option>
+      <option value="whole">שלמים</option>
+    </select>
+  </div>
+  <button class="btn" onclick="recalc()">חשב מפה ☽</button>
+</div>
+
+<!-- ═══ VIEW: TRANSIT ═══ -->
+<div id="view-transit" class="view">
+  <div class="view-bar">
+    <label>📅 תאריך מעברים:</label>
+    <button class="date-btn" id="tDateDisplay" onclick="openDrum('t')"></button>
+    <input type="hidden" id="tDay">
+    <input type="hidden" id="tMonth">
+    <input type="hidden" id="tYear">
+    <div class="tdate-nav">
+      <button onclick="shiftDate(-7)">◀◀ שבוע</button>
+      <button onclick="shiftDate(-1)">◀ יום</button>
+      <button onclick="shiftDate(1)">יום ▶</button>
+      <button onclick="shiftDate(7)">שבוע ▶▶</button>
+    </div>
+    <button class="btn" onclick="recalc()">עדכן מעברים</button>
+    <span id="sunInfo" style="color:#ffd700;font-size:13px"></span>
+  </div>
+  <main>
+    <div class="chart-wrap">
+      <svg id="astroChart" class="chart-svg" width="700" height="700" viewBox="0 0 700 700"></svg>
+    </div>
+    <div style="display:none">
+      <div id="transitMiniList"></div>
+      <div id="natalMiniList"></div>
+    </div>
+    <div class="reading-side-panel" id="generalReadingPanel">
+      <div class="reading-side-title">✨ קריאה כללית</div>
+      <div id="generalReadingContent"></div>
+    </div>
+  </main>
+  <div class="tables-section">
+    <div class="compare-wrap">
+      <div class="data-table-wrap">
+        <div class="table-title">☉ מפת לידה — כוכבים</div>
+        <table id="natalTable"><tr><th>כוכב</th><th>מזל</th><th>מעלה</th><th>בית</th></tr></table>
+      </div>
+      <div class="data-table-wrap">
+        <div class="table-title">☽ מעברים</div>
+        <table id="transitTable"><tr><th>כוכב</th><th>מזל</th><th>מעלה</th><th>Rx</th></tr></table>
+      </div>
+    </div>
+    <div class="data-table-wrap" style="min-width:340px">
+      <div class="table-title">⚡ זוויות בין מעברים ומפת לידה</div>
+      <table id="aspectTable"><tr><th>מעבר</th><th>זווית</th><th>נטלי</th><th>הפרש</th><th>מדויק</th></tr></table>
+    </div>
+  </div>
+  <div class="reading-section">
+    <div class="reading-header">
+      <div class="reading-title">✦ קריאת כוכבים ✦</div>
+      <div class="reading-subtitle">פרשנות אסטרולוגית לתאריך <span id="readingDate"></span></div>
+    </div>
+    <div class="reading-grid">
+      <div class="reading-card">
+        <div class="reading-card-title">🪐 מצב הכוכבים כעת</div>
+        <div id="planetPositionsContent"></div>
+      </div>
+      <div class="reading-card">
+        <div class="reading-card-title">⚡ מעברים משמעותיים</div>
+        <div id="significantTransitsContent"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VIEW: NATAL ═══ -->
+<div id="view-natal" class="view" style="display:none">
+  <main>
+    <div class="chart-wrap">
+      <svg id="natalSvg" class="chart-svg" width="700" height="700" viewBox="0 0 700 700"></svg>
+    </div>
+    <div class="side-panel">
+      <div class="panel-card">
+        <h3>✨ קריאה נטלית</h3>
+        <div id="natalReadingContent" style="font-size:12px;color:#7060a0">טוען...</div>
+      </div>
+      <div class="panel-card" id="houseReadingPanel">
+        <h3>🏠 קריאת בתים</h3>
+        <div id="houseReadingContent" style="font-size:11px;color:#7060a0;line-height:1.7">טוען...</div>
+      </div>
+      <div class="panel-card" style="font-size:11px;color:#7060a0;line-height:1.6">
+        <h3>מפתח</h3>
+        ☉ שמש &nbsp; ☽ ירח &nbsp; ☿ מרקורי &nbsp; ♀ נוגה<br>
+        ♂ מאדים &nbsp; ♃ צדק &nbsp; ♄ שבתאי<br>
+        ♅ אורנוס &nbsp; ♆ נפטון &nbsp; ♇ פלוטו
+      </div>
+    </div>
+  </main>
+  <div class="tables-section">
+    <div class="data-table-wrap" style="min-width:280px">
+      <div class="table-title">☉ כוכבים</div>
+      <table id="natalPlanetTable"><tr><th>כוכב</th><th>מזל</th><th>מעלה</th><th>בית</th></tr></table>
+    </div>
+    <div class="data-table-wrap" style="min-width:200px">
+      <div class="table-title">🏠 בתים</div>
+      <table id="natalHousesTable"><tr><th>בית</th><th>מזל</th><th>מעלה</th></tr></table>
+    </div>
+    <div class="data-table-wrap" style="min-width:320px">
+      <div class="table-title">⚡ זוויות נטליות</div>
+      <table id="natalAspectTable"><tr><th>כוכב א</th><th>זווית</th><th>כוכב ב</th><th>הפרש</th></tr></table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VIEW: SYNASTRY ═══ -->
+<div id="view-synastry" class="view" style="display:none">
+  <div class="person2-bar">
+    <b style="color:#ffb0a0;font-size:14px">👤 אדם שני:</b>
+    <div class="pgroup"><label>תאריך</label><input type="date" id="bDate2" value="1992-06-20"></div>
+    <div class="pgroup"><label>שעה</label><input type="time" id="bTime2" value="08:00"></div>
+    <div class="pgroup"><label>קו רוחב</label><input type="number" id="bLat2" value="32.08" step="0.01" style="width:80px"></div>
+    <div class="pgroup"><label>קו אורך</label><input type="number" id="bLon2" value="34.78" step="0.01" style="width:80px"></div>
+    <button class="btn" style="background:linear-gradient(135deg,#8a1020,#cc3040)" onclick="recalcPerson2()">חשב תאימות ♡</button>
+  </div>
+  <main>
+    <div class="chart-wrap">
+      <svg id="synastrySvg" class="chart-svg" width="700" height="700" viewBox="0 0 700 700" style="filter:drop-shadow(0 0 30px rgba(255,100,100,.3))"></svg>
+    </div>
+    <div class="side-panel">
+      <div class="panel-card">
+        <h3>♡ קריאת תאימות</h3>
+        <div id="synastryReadingContent" style="color:#7060a0;font-size:12px">הכניסו נתוני אדם שני ולחצו "חשב תאימות"</div>
+      </div>
+      <div class="panel-card" style="font-size:11px;color:#7060a0;line-height:1.7">
+        <h3>מקרא</h3>
+        <span style="color:#d0d0d0">●</span> אדם 1 — חוג פנימי<br>
+        <span style="color:#d0d0d0;opacity:.55">●</span> אדם 2 — חוג חיצוני<br>
+        ☌ חיבור עמוק &nbsp; △ הרמוניה<br>
+        □ אתגר גדילה &nbsp; ☍ מתח ואיזון
+      </div>
+    </div>
+  </main>
+  <div class="tables-section">
+    <div class="data-table-wrap" style="flex:1;min-width:340px">
+      <div class="table-title">⚡ זוויות בין שני האנשים</div>
+      <table id="synastryAspectTable"><tr><th>אדם 1</th><th>זווית</th><th>אדם 2</th><th>הפרש</th><th>מדויק</th></tr></table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VIEW: FORECAST ═══ -->
+<div id="view-forecast" class="view" style="display:none">
+  <div class="view-bar">
+    <label>📅 תחזית לפרק:</label>
+    <select id="forecastDays" style="background:#fff;border:1px solid rgba(160,118,38,0.28);color:var(--text);padding:6px 12px;border-radius:5px;font-family:inherit;font-size:13px;outline:none">
+      <option value="30">30 יום</option>
+      <option value="60">60 יום</option>
+      <option value="90" selected>90 יום</option>
+    </select>
+    <button class="btn" onclick="renderForecastView()">חשב תחזית ✦</button>
+  </div>
+  <div style="position:relative;z-index:5;padding:20px 30px">
+    <div class="reading-header">
+      <div class="reading-title">✦ תחזית אישית ✦</div>
+      <div class="reading-subtitle">מעברים פלנטריים ומשמעותם</div>
+    </div>
+    <div class="legend-box">
+      <span class="legend-title">מקרא</span>
+      <div class="legend-item">
+        <div class="legend-bar" style="background:#44cc77"></div>
+        <span><strong>הרמוני</strong> — טריגון △ / סקסטיל ⚹ · מעבר תומך וזורם</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-bar" style="background:#ff4040"></div>
+        <span><strong>מאתגר</strong> — ריבוע □ / אופוזיציה ☍ · מתח שמניע לצמיחה</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-bar" style="background:#9060ff"></div>
+        <span><strong>עוצמה</strong> — קוניונקציה ☌ · כוחות מתמזגים, עצמה יוצאת דופן</span>
+      </div>
+    </div>
+    <div id="forecastContent"></div>
+  </div>
+</div>
+
+<!-- ═══ VIEW: HOROSCOPE ═══ -->
+<div id="view-horoscope" class="view" style="display:none">
+  <div class="view-bar">
+    <span style="color:#ffd700;font-size:13px">📅 <span id="horoDate"></span></span>
+    <span style="color:#d0d0d0;font-size:13px" id="horoMoonInfo"></span>
+    <span style="color:#ffd700;font-size:13px" id="horoSunInfo"></span>
+  </div>
+  <div style="position:relative;z-index:5;padding:20px 30px">
+    <div class="reading-header">
+      <div class="reading-title">✦ הורוסקופ יומי ✦</div>
+      <div class="reading-subtitle">קריאה לכל 12 המזלות — <span id="horoSubDate"></span></div>
+    </div>
+    <div class="legend-box">
+      <span class="legend-title">מקרא — רמת אנרגיה</span>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#44cc77"></div>
+        <span><strong>⬆ גבוהה</strong> — אנרגיה חיובית, יום מיטיב</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#ffd700"></div>
+        <span><strong>↔ ממוצעת</strong> — אנרגיה מאוזנת, יום רגיל</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#ff8833"></div>
+        <span><strong>⬇ נמוכה</strong> — אנרגיה נמוכה, כדאי להיזהר</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#ff4444"></div>
+        <span><strong>⚠ מאתגרת</strong> — יום מאתגר, פעלו בזהירות ומודעות</span>
+      </div>
+    </div>
+    <div id="horoGrid" class="horo-grid"></div>
+  </div>
+</div>
+
+<!-- ═══ VIEW: SUBSCRIPTION ═══ -->
+<div id="view-subscription" class="view" style="display:none">
+  <div class="sub-wrap">
+    <div class="sub-header">
+      <span class="sub-title">ניהול מנוי</span>
+      <div class="sub-subtitle">אסטרולוגיה מקצועית — תוכניות ומנויים</div>
+    </div>
+
+    <!-- סטטוס מנוי נוכחי -->
+    <div class="sub-status-card" id="subStatusCard">
+      <div class="sub-status-row">
+        <div style="font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--text)">מנוי נוכחי</div>
+        <span class="sub-badge sub-badge-trial" id="subBadge">⬤ ניסיון חינמי</span>
+      </div>
+      <div class="sub-details-grid" id="subDetailsGrid">
+        <div class="sub-detail"><div class="sub-detail-label">תוכנית</div><div class="sub-detail-value" id="subPlanName">חינמי</div></div>
+        <div class="sub-detail"><div class="sub-detail-label">תחילת מנוי</div><div class="sub-detail-value" id="subStartDate">—</div></div>
+        <div class="sub-detail"><div class="sub-detail-label">תפוגה</div><div class="sub-detail-value" id="subEndDate">—</div></div>
+        <div class="sub-detail"><div class="sub-detail-label">מחיר חודשי</div><div class="sub-detail-value" id="subPrice">חינם</div></div>
+        <div class="sub-detail"><div class="sub-detail-label">מפות שמורות</div><div class="sub-detail-value" id="subMapsUsed">0 / 15</div></div>
+        <div class="sub-detail"><div class="sub-detail-label">שליחת תחזית</div><div class="sub-detail-value" id="subNotify">לא פעיל</div></div>
+      </div>
+      <div class="sub-cancel-note">
+        לביטול מנוי שלחו מייל ל: <a href="mailto:support@astrologiapro.co.il">support@astrologiapro.co.il</a>
+        עם הכותרת "ביטול מנוי" ושם המשתמש שלכם. הביטול ייכנס לתוקף בסוף תקופת החיוב הנוכחית.
+      </div>
+    </div>
+
+    <!-- תוכניות רכישה -->
+    <div style="font-family:'Cinzel',serif;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px">תוכניות מנוי</div>
+    <div class="plans-grid">
+
+      <div class="plan-card">
+        <div class="plan-name">חינמי</div>
+        <div class="plan-price">₪0<span>/חודש</span></div>
+        <div class="plan-period">תמיד חינם</div>
+        <ul class="plan-features">
+          <li>מפת מעברים בסיסית</li>
+          <li>הורוסקופ יומי</li>
+          <li>3 מפות שמורות</li>
+          <li>תחזית 30 יום</li>
+        </ul>
+        <button class="btn-plan btn-plan-outline" onclick="alert('אתם כבר בתוכנית החינמית')">תוכנית נוכחית</button>
+      </div>
+
+      <div class="plan-card recommended">
+        <div class="plan-rec-badge">⬤ הכי פופולרי</div>
+        <div class="plan-name">פרמיום</div>
+        <div class="plan-price">₪49<span>/חודש</span></div>
+        <div class="plan-period">או ₪490/שנה (חיסכון של 2 חודשים)</div>
+        <ul class="plan-features">
+          <li>כל תכונות החינמי</li>
+          <li>15 מפות שמורות</li>
+          <li>תחזית 90 יום</li>
+          <li>מפת לידה מלאה</li>
+          <li>השוואת מפות (Synastry)</li>
+          <li>תחזית יומית בוואצאפ / מייל</li>
+          <li>כירון + צמתים לונריים</li>
+          <li>מערכת בתים פלאסידוס</li>
+        </ul>
+        <button class="btn-plan btn-plan-fill" onclick="subscribePlan('premium')">הצטרף עכשיו ₪49/חודש</button>
+      </div>
+
+      <div class="plan-card">
+        <div class="plan-name">שנתי פרמיום</div>
+        <div class="plan-price">₪490<span>/שנה</span></div>
+        <div class="plan-period">חיסכון של ₪98 לעומת חודשי</div>
+        <ul class="plan-features">
+          <li>כל תכונות הפרמיום</li>
+          <li>עדיפות בתמיכה</li>
+          <li>גישה לתכונות חדשות ראשון</li>
+          <li>2 חודשים חינם</li>
+        </ul>
+        <button class="btn-plan btn-plan-outline" onclick="subscribePlan('annual')">הצטרף שנתי</button>
+      </div>
+
+    </div>
+
+    <div style="text-align:center;font-size:11px;color:var(--text-dim);padding-top:8px">
+      התשלום מתבצע דרך כרטיס אשראי מאובטח · ניתן לבטל בכל עת · ללא קנסות<br>
+      לשאלות: <a href="mailto:support@astrologiapro.co.il" style="color:var(--gold);text-decoration:none">support@astrologiapro.co.il</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DRUM DATE PICKER ═══ -->
+<div id="drumModal" class="modal-overlay" style="display:none" onclick="drumCloseBg(event)">
+  <div class="drum-modal">
+    <div class="drum-title" id="drumTitle">בחר תאריך</div>
+    <div class="drum-container">
+      <div class="drum-selection"></div>
+      <div class="drum-col" id="drum-day"></div>
+      <div class="drum-divider"></div>
+      <div class="drum-col" id="drum-month"></div>
+      <div class="drum-divider"></div>
+      <div class="drum-col" id="drum-year"></div>
+    </div>
+    <div class="drum-footer">
+      <button class="drum-cancel" onclick="closeDrum()">ביטול</button>
+      <button class="drum-confirm" onclick="confirmDrum()">אישור ✓</button>
+    </div>
+  </div>
+</div>
+
+<footer>אסטרולוגיה מקצועית — חישובים אסטרונומיים בזמן אמת</footer>
+
+<script>
+// ─── Stars (twinkling) ────────────────────────────────────────────────────────
+(function(){
+  const c=document.getElementById('stars'),ctx=c.getContext('2d');
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  const stars=[];
+  for(let i=0;i<280;i++) stars.push({
+    x:Math.random(),y:Math.random(),
+    r:Math.random()*1.4+0.15,
+    a:Math.random()*0.6+0.08,
+    spd:Math.random()*0.012+0.003,
+    ph:Math.random()*Math.PI*2
+  });
+  let t=0;
+  (function draw(){
+    requestAnimationFrame(draw);t+=0.016;
+    ctx.clearRect(0,0,c.width,c.height);
+    stars.forEach(s=>{
+      const alpha=s.a*(0.55+0.45*Math.sin(s.ph+t*s.spd*60));
+      ctx.beginPath();ctx.arc(s.x*c.width,s.y*c.height,s.r,0,6.28);
+      ctx.fillStyle=`rgba(210,200,255,${Math.max(0,Math.min(1,alpha)).toFixed(2)})`;
+      ctx.fill();
+    });
+  })();
+})();
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+const DEG=Math.PI/180;
+const CX=350,CY=350;
+const R={
+  zo:272,   // גלגל מזלות חיצוני
+  zi:220,   // גלגל מזלות פנימי
+  to:335,   // טבעת מעברים (מחוץ לגלגל)
+  tp:316,   // מיקום כוכבי מעבר
+  np:195,   // מיקום כוכבי לידה (בין גלגל לטבעת פנימית)
+  ai:168,   // טבעת פנימית (גבול בתים)
+  hp:250,   // ציר ASC/DSC/MC/IC
+};
+
+const SIGNS=[
+  {n:'טלה',  g:'♈',el:'fire',  col:'#cc2222'},
+  {n:'שור',  g:'♉',el:'earth', col:'#227722'},
+  {n:'תאומים',g:'♊',el:'air',  col:'#bb6600'},
+  {n:'סרטן', g:'♋',el:'water', col:'#2244bb'},
+  {n:'אריה', g:'♌',el:'fire',  col:'#cc2222'},
+  {n:'בתולה',g:'♍',el:'earth', col:'#227722'},
+  {n:'מאזניים',g:'♎',el:'air', col:'#bb6600'},
+  {n:'עקרב', g:'♏',el:'water', col:'#2244bb'},
+  {n:'קשת',  g:'♐',el:'fire',  col:'#cc2222'},
+  {n:'גדי',  g:'♑',el:'earth', col:'#227722'},
+  {n:'דלי',  g:'♒',el:'air',   col:'#bb6600'},
+  {n:'דגים', g:'♓',el:'water', col:'#2244bb'}
+];
+
+const ELCOLS={fire:'rgba(255,210,210,0.25)',earth:'rgba(210,240,210,0.25)',air:'rgba(255,235,180,0.22)',water:'rgba(180,205,255,0.25)'};
+
+const PLANETS=[
+  {n:'שמש',   g:'☉',col:'#ffd700'},
+  {n:'ירח',   g:'☽',col:'#d0d0d0'},
+  {n:'מרקורי',g:'☿',col:'#a0b8d0'},
+  {n:'נוגה',  g:'♀',col:'#90e890'},
+  {n:'מאדים', g:'♂',col:'#ff6647'},
+  {n:'צדק',   g:'♃',col:'#ffb040'},
+  {n:'שבתאי', g:'♄',col:'#e0c060'},
+  {n:'אורנוס',g:'♅',col:'#60d0e0'},
+  {n:'נפטון', g:'♆',col:'#4080f0'},
+  {n:'פלוטו', g:'♇',col:'#c060c0'},
+  {n:'כירון', g:'⚷',col:'#c07028'},
+  {n:'ראש דרקון',g:'☊',col:'#228844'},
+  {n:'זנב דרקון',g:'☋',col:'#886622'}
+];
+
+const ASPECTS=[
+  {n:'קוניונקציה', a:0,  orb:8,col:'#cc1818',g:'☌',cls:'asp-conj',dash:false},
+  {n:'סקסטיל',     a:60, orb:6,col:'#1a9933',g:'⚹',cls:'asp-sex', dash:true},
+  {n:'ריבוע',      a:90, orb:8,col:'#cc1818',g:'□',cls:'asp-sq',  dash:false},
+  {n:'טריגון',     a:120,orb:8,col:'#1a33cc',g:'△',cls:'asp-tri', dash:false},
+  {n:'אופוזיציה',  a:180,orb:8,col:'#cc1818',g:'☍',cls:'asp-opp', dash:false},
+  {n:'אינקוניונקט',a:150,orb:3,col:'#1a9933',g:'⚻',cls:'asp-incon',dash:true}
+];
+
+// ─── Astronomical Math ────────────────────────────────────────────────────────
+function toJD(y,m,d,h,min){
+  if(m<=2){y--;m+=12;}
+  const A=Math.floor(y/100),B=2-A+Math.floor(A/4);
+  return Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+d+B-1524.5+(h+min/60)/24;
+}
+function mod360(x){return((x%360)+360)%360;}
+function rad(d){return d*DEG;}
+function deg(r){return r/DEG;}
+
+function solveKepler(M,e){
+  let E=M;
+  for(let i=0;i<60;i++){const d=(M-E+e*Math.sin(E))/(1-e*Math.cos(E));E+=d;if(Math.abs(d)<1e-10)break;}
+  return E;
+}
+
+const OE={
+  mercury:{a:[0.38710,0],e:[0.20563,0.00002],I:[7.005,-0.0059],L:[252.251,149472.6741],W:[77.456,0.1597],O:[48.331,-0.1253]},
+  venus:  {a:[0.72333,0],e:[0.00677,-0.00045],I:[3.395,-0.0081],L:[181.980,58517.8157],W:[131.564,0.5533],O:[76.680,-0.2776]},
+  earth:  {a:[1.00000,0],e:[0.01671,-0.00004],I:[0.000,-0.0001],L:[100.465,35999.3728],W:[102.937,0.3179],O:[0,0]},
+  mars:   {a:[1.52366,0],e:[0.09341,0.00012],I:[1.851,-0.0073],L:[355.433,19140.2993],W:[336.061,0.4444],O:[49.558,-0.2926]},
+  jupiter:{a:[5.20336,-0.00002],e:[0.04839,-0.00013],I:[1.303,-0.0056],L:[34.397,3034.9057],W:[14.331,0.2263],O:[100.464,0.2048]},
+  saturn: {a:[9.53707,-0.00125],e:[0.05415,-0.00050],I:[2.484,0.0013],L:[49.953,1222.1138],W:[92.598,0.5415],O:[113.666,-0.2894]},
+  uranus: {a:[19.19126,-0.00196],e:[0.04717,-0.00004],I:[0.770,-0.0018],L:[313.232,428.0495],W:[170.955,0.0905],O:[74.006,0.0413]},
+  neptune:{a:[30.06896,-0.00125],e:[0.00859,0.00005],I:[1.770,-0.0003],L:[-55.121,218.4600],W:[44.965,-0.3201],O:[131.784,-0.0061]},
+  pluto:  {a:[39.48168,-0.00003],e:[0.24880,0.00005],I:[17.142,0.0004],L:[238.929,145.2097],W:[224.070,-0.0410],O:[110.307,-0.0129]},
+  chiron: {a:[13.7054,0],e:[0.38316,0],I:[6.935,0],L:[215.8,710.0],W:[188.24,0],O:[208.66,0]}
+};
+
+function helioXYZ(name,T){
+  const el=OE[name];
+  const a=el.a[0]+el.a[1]*T,e=el.e[0]+el.e[1]*T;
+  const I=rad(el.I[0]+el.I[1]*T),L=rad(mod360(el.L[0]+el.L[1]*T));
+  const W=rad(mod360(el.W[0]+el.W[1]*T)),O=rad(mod360(el.O[0]+el.O[1]*T));
+  const w=W-O,M=L-W;
+  const E=solveKepler(((M%(2*Math.PI))+(2*Math.PI))%(2*Math.PI),e);
+  const xp=a*(Math.cos(E)-e),yp=a*Math.sqrt(1-e*e)*Math.sin(E);
+  const cosO=Math.cos(O),sinO=Math.sin(O),cosw=Math.cos(w),sinw=Math.sin(w),cosI=Math.cos(I),sinI=Math.sin(I);
+  return{x:(cosO*cosw-sinO*sinw*cosI)*xp+(-cosO*sinw-sinO*cosw*cosI)*yp,
+         y:(sinO*cosw+cosO*sinw*cosI)*xp+(-sinO*sinw+cosO*cosw*cosI)*yp,
+         z:(sinw*sinI)*xp+(cosw*sinI)*yp};
+}
+function geoLon(name,T){const p=helioXYZ(name,T),e=helioXYZ('earth',T);return mod360(deg(Math.atan2(p.y-e.y,p.x-e.x)));}
+function sunLon(T){
+  const e=helioXYZ('earth',T);
+  const lon=mod360(deg(Math.atan2(-e.y,-e.x)));
+  // Aberration + nutation (dominant terms)
+  const omega=mod360(125.04452-1934.136261*T);
+  return mod360(lon-0.00569-0.00478*Math.sin(rad(omega)));
+}
+function moonLon(jd){
+  const T=(jd-2451545.0)/36525;
+  const d=jd-2451545.0;
+  const L=mod360(218.3165+13.17639648*d);
+  const M=mod360(357.5291+0.98560028*d);
+  const Mp=mod360(134.9634+13.06499295*d);
+  const D=mod360(297.8502+12.19074912*d);
+  const F=mod360(93.2721+13.22935024*d);
+  const A1=mod360(119.75+131.849*T);
+  const A2=mod360(53.09+479264.290*T);
+  const E=1-0.002516*T-0.0000074*T*T;
+  const E2=E*E;
+  const r=rad;
+  let dL=
+    6288774*Math.sin(r(Mp))
+    -1274027*Math.sin(r(2*D-Mp))
+    +658314*Math.sin(r(2*D))
+    -213618*Math.sin(r(2*Mp))
+    -185116*E*Math.sin(r(M))
+    -114332*Math.sin(r(2*F))
+    +58793*Math.sin(r(2*D-2*Mp))
+    +57066*E*Math.sin(r(2*D-M-Mp))
+    +53322*Math.sin(r(2*D+Mp))
+    +45758*E*Math.sin(r(2*D-M))
+    -40923*E*Math.sin(r(M-Mp))
+    -34720*Math.sin(r(D))
+    -30383*E*Math.sin(r(M+Mp))
+    +15327*Math.sin(r(2*D-2*F))
+    -12528*Math.sin(r(Mp+2*F))
+    +10980*Math.sin(r(Mp-2*F))
+    +10675*Math.sin(r(4*D-Mp))
+    +10034*Math.sin(r(3*Mp))
+    +8548*Math.sin(r(4*D-2*Mp))
+    -7888*E*Math.sin(r(2*D+M-Mp))
+    -6766*E*Math.sin(r(2*D+M))
+    -5163*Math.sin(r(D-Mp))
+    +4987*E*Math.sin(r(D+M))
+    +4036*E*Math.sin(r(2*D-M+Mp))
+    +3994*Math.sin(r(2*D+2*Mp))
+    +3861*Math.sin(r(4*D))
+    +3665*Math.sin(r(2*D-3*Mp))
+    -2689*E*Math.sin(r(M-2*Mp))
+    -2602*Math.sin(r(2*D-Mp-2*F))
+    +2390*E*Math.sin(r(2*D-M-2*Mp))
+    -2348*Math.sin(r(D+Mp))
+    +2236*E2*Math.sin(r(2*D-2*M))
+    -2120*E*Math.sin(r(M+2*Mp))
+    -2069*E2*Math.sin(r(2*M))
+    +2048*E2*Math.sin(r(2*D-2*M-Mp))
+    -1773*Math.sin(r(2*D+Mp-2*F))
+    -1595*Math.sin(r(2*(D+F)))
+    +1215*E*Math.sin(r(4*D-M-Mp))
+    -1110*Math.sin(r(2*Mp+2*F))
+    -892*Math.sin(r(3*D-Mp))
+    -810*E*Math.sin(r(2*D+M+Mp))
+    +759*E*Math.sin(r(4*D-M-2*Mp))
+    -713*E2*Math.sin(r(2*M-Mp))
+    -700*E*Math.sin(r(2*D+2*M-Mp))
+    +596*E*Math.sin(r(2*D-M+2*F))
+    +549*Math.sin(r(4*D+Mp))
+    +537*Math.sin(r(4*Mp))
+    +520*E*Math.sin(r(4*D-M))
+    -487*Math.sin(r(D-2*Mp))
+    -399*E*Math.sin(r(2*F+2*D+M))
+    -381*Math.sin(r(2*Mp-2*F))
+    +351*E*Math.sin(r(D+M+Mp))
+    -340*Math.sin(r(3*D-2*Mp))
+    +330*Math.sin(r(4*D-3*Mp))
+    +327*E*Math.sin(r(2*D-M+2*Mp))
+    -323*E2*Math.sin(r(2*M+Mp))
+    +299*E*Math.sin(r(D+M-Mp))
+    +294*Math.sin(r(2*D+3*Mp));
+  dL+=3958*Math.sin(r(A1))+1962*Math.sin(r(L-F))+318*Math.sin(r(A2));
+  return mod360(L+dL/1000000);
+}
+function isRetrograde(name,T){
+  if(name==='sun'||name==='moon')return false;
+  const d2=0.005;
+  const l1=geoLon(name,T-d2/36525),l2=geoLon(name,T+d2/36525);
+  let diff=l2-l1;if(diff>180)diff-=360;if(diff<-180)diff+=360;return diff<0;
+}
+// Moon longitude — uses astronomy-engine if loaded (sub-arcsecond), else Meeus 60-term fallback
+function moonLonAccurate(jd){
+  if(typeof Astronomy!=='undefined'){
+    try{
+      const ms=(jd-2440587.5)*86400000;
+      const time=Astronomy.MakeTime(new Date(ms));
+      const ec=Astronomy.EclipticGeoMoon(time);
+      return mod360(ec.lon);
+    }catch(e){}
+  }
+  return moonLon(jd);
+}
+
+function northNodeLon(T){
+  // Mean ascending node (Meeus Ch.47, more precise coefficients)
+  const Omega=mod360(125.0445479-1934.1362608*T+0.0020754*T*T+0.0000021*T*T*T);
+  // True node corrections (Meeus Ch.47)
+  const d=T*36525;
+  const D=mod360(297.8502+12.19074912*d);
+  const M=mod360(357.5291+0.98560028*d);
+  const Mp=mod360(134.9634+13.06499295*d);
+  const F=mod360(93.2721+13.22935024*d);
+  const dO=-1.4979*Math.sin(rad(2*(D-F)))-0.1500*Math.sin(rad(M))
+           -0.1226*Math.sin(rad(2*D))+0.1176*Math.sin(rad(2*F))
+           -0.0801*Math.sin(rad(2*(Mp-F)));
+  return mod360(Omega+dO);
+}
+
+// General precession in ecliptic longitude J2000 → tropical of date (degrees)
+function precessionCorr(T){return(5029.097+2.222*T)*T/3600;}
+
+function computeAllPlanets(jd){
+  const T=(jd-2451545)/36525;
+  const prec=precessionCorr(T);
+  const nn=northNodeLon(T); // already tropical
+  const lons=[
+    mod360(sunLon(T)+prec),
+    moonLonAccurate(jd),     // astronomy-engine (accurate) or Meeus fallback
+    mod360(geoLon('mercury',T)+prec),
+    mod360(geoLon('venus',T)+prec),
+    mod360(geoLon('mars',T)+prec),
+    mod360(geoLon('jupiter',T)+prec),
+    mod360(geoLon('saturn',T)+prec),
+    mod360(geoLon('uranus',T)+prec),
+    mod360(geoLon('neptune',T)+prec),
+    mod360(geoLon('pluto',T)+prec),
+    mod360(geoLon('chiron',T)+prec), // כירון
+    nn,                               // צומת צפוני
+    mod360(nn+180)                    // צומת דרומי
+  ];
+  const outerNames=['mercury','venus','mars','jupiter','saturn','uranus','neptune','pluto','chiron'];
+  const retros=lons.map((_,i)=>{
+    if(i<2||i>10)return false; // שמש, ירח, צמתים — לא מחשבים נסיגה
+    return isRetrograde(outerNames[i-2],T);
+  });
+  return{lons,retros};
+}
+
+// ─── Chart Coordinate ─────────────────────────────────────────────────────────
+function lonToXY(lon,r){const a=rad(180-lon);return{x:CX+r*Math.cos(a),y:CY+r*Math.sin(a)};}
+function svgEl(tag,attrs,txt){
+  const el=document.createElementNS('http://www.w3.org/2000/svg',tag);
+  for(const k in attrs)el.setAttribute(k,attrs[k]);
+  if(txt!==undefined)el.textContent=txt;
+  return el;
+}
+
+// ─── Draw Zodiac Base (shared) ────────────────────────────────────────────────
+function drawZodiacBase(svg,bgId){
+  const defs=svgEl('defs',{});
+  // Gradient: very light blue outer → cream inner
+  const rg=svgEl('radialGradient',{id:bgId,cx:'50%',cy:'50%',r:'50%'});
+  rg.appendChild(svgEl('stop',{offset:'0%','stop-color':'#f0f4ff','stop-opacity':'1'}));
+  rg.appendChild(svgEl('stop',{offset:'55%','stop-color':'#f5f1e8','stop-opacity':'1'}));
+  rg.appendChild(svgEl('stop',{offset:'100%','stop-color':'#eae4d4','stop-opacity':'1'}));
+  defs.appendChild(rg);svg.appendChild(defs);
+
+  // רקע מלא עד לטבעת המעברים
+  svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:R.to+14,fill:`url(#${bgId})`}));
+
+  // גלגל מזלות — סקטורים
+  SIGNS.forEach((s,i)=>{
+    const l1=i*30,l2=l1+30;
+    const p1=lonToXY(l1,R.zo),p2=lonToXY(l2,R.zo),p3=lonToXY(l2,R.zi),p4=lonToXY(l1,R.zi);
+    const arch=SIGN_ARCHETYPE[i];
+    const sector=svgEl('path',{d:`M${p1.x},${p1.y} A${R.zo},${R.zo} 0 0,1 ${p2.x},${p2.y} L${p3.x},${p3.y} A${R.zi},${R.zi} 0 0,0 ${p4.x},${p4.y} Z`,
+      fill:ELCOLS[s.el],stroke:'#aaa','stroke-width':'0.8',style:'cursor:pointer'});
+    if(arch){const t=document.createElementNS('http://www.w3.org/2000/svg','title');
+      t.textContent=`${s.n} ${s.g}\n${arch.el} ${arch.mod} | שליט: ${arch.ruler}\n${arch.theme}\nמפתח: ${arch.key}`;
+      sector.appendChild(t);}
+    svg.appendChild(sector);
+    // גליף מזל
+    const mid=lonToXY(l1+15,(R.zo+R.zi)/2);
+    svg.appendChild(svgEl('text',{x:mid.x,y:mid.y,'text-anchor':'middle','dominant-baseline':'middle',
+      'font-size':'22','fill':s.col,'font-family':'serif','font-weight':'bold'},s.g));
+    // קו גבול מזל
+    const pa=lonToXY(l1,R.zo),pb=lonToXY(l1,R.zi);
+    svg.appendChild(svgEl('line',{x1:pa.x,y1:pa.y,x2:pb.x,y2:pb.y,stroke:'#999','stroke-width':'0.8'}));
+  });
+
+  // סימוני מעלות — צפופים
+  for(let d=0;d<360;d++){
+    const is30=d%30===0,is10=d%10===0,is5=d%5===0;
+    const len=is30?0:is10?8:is5?5:3;
+    if(is30)continue; // גבולות מזל כבר מצוירים
+    const rOut=R.zo,rIn=R.zo-len;
+    const pa=lonToXY(d,rOut),pb=lonToXY(d,rIn);
+    svg.appendChild(svgEl('line',{x1:pa.x,y1:pa.y,x2:pb.x,y2:pb.y,
+      stroke:'#888','stroke-width':is10?'0.9':'0.5','stroke-opacity':'0.7'}));
+  }
+
+  // עיגולים: חיצוני גלגל + פנימי גלגל
+  svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:R.zo,fill:'none',stroke:'#888','stroke-width':'1.5'}));
+  svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:R.zi,fill:'none',stroke:'#aaa','stroke-width':'1'}));
+}
+
+function drawHouses(svg,housesArr,showNums){
+  // טבעת הפרדה בין נטלי לאזור בתים
+  svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:R.zi,fill:'rgba(255,255,255,0.0)'}));
+  // מעגל פנימי
+  svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:R.ai,fill:'rgba(255,255,255,0.5)',stroke:'#aaa','stroke-width':'1'}));
+  // קו מקווקו הפרדת נטלי
+  svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:R.np+14,fill:'none',stroke:'rgba(100,100,100,0.25)','stroke-width':'0.7','stroke-dasharray':'3,3'}));
+
+  housesArr.forEach((h,i)=>{
+    const isMain=[0,3,6,9].includes(i);
+    // קו בית מגלגל ועד מרכז
+    const pa=lonToXY(h,R.zi),pb=lonToXY(h,12);
+    svg.appendChild(svgEl('line',{x1:pa.x,y1:pa.y,x2:pb.x,y2:pb.y,
+      stroke:isMain?'rgba(0,0,0,0.8)':'rgba(80,80,80,0.35)',
+      'stroke-width':isMain?1.8:0.8}));
+    if(showNums){
+      const mid=mod360(h+15),pr=lonToXY(mid,R.ai-28);
+      svg.appendChild(svgEl('text',{x:pr.x,y:pr.y,'text-anchor':'middle','dominant-baseline':'middle',
+        'font-size':'12','fill':'#444','font-weight':'500'},String(i+1)));
+    }
+  });
+}
+
+function drawAxisLabels(svg,asc){
+  const mc=mcLon||mod360(asc+270);
+  [{lon:asc,l:'ASC',c:'#8a6010'},{lon:mod360(asc+180),l:'האופק',c:'#334d99'},
+   {lon:mc,l:'MC',c:'#555'},{lon:mod360(mc+180),l:'IC',c:'#555'}]
+  .forEach(({lon,l,c})=>{
+    // קו ציר מגלגל לגלגל
+    const pa=lonToXY(lon,R.zi),pb=lonToXY(lon,12);
+    svg.appendChild(svgEl('line',{x1:pa.x,y1:pa.y,x2:pb.x,y2:pb.y,stroke:'rgba(0,0,0,0.75)','stroke-width':'1.8'}));
+    // תווית מחוץ לגלגל
+    const pt=lonToXY(lon,R.zo+30);
+    svg.appendChild(svgEl('text',{x:pt.x,y:pt.y,'text-anchor':'middle','dominant-baseline':'middle',
+      'font-size':'10','fill':c,'font-weight':'bold'},l));
+  });
+}
+
+function drawPlanets(svg,data,ringR,edgeR,fontSize,isTransit){
+  const used=[];
+  data.lons.forEach((lon,i)=>{
+    let offset=0;
+    used.forEach(u=>{let d=Math.abs(lon-u);if(d>180)d=360-d;if(d<6)offset+=24;});
+    used.push(lon);
+    const r=ringR-offset;
+    // נקודה על הגבול
+    const pe=lonToXY(lon,edgeR);
+    svg.appendChild(svgEl('circle',{cx:pe.x,cy:pe.y,r:'2',fill:isTransit?PLANETS[i].col:'#333'}));
+    // קו קטן מהגבול לגליף
+    const plink=lonToXY(lon,r+4);
+    svg.appendChild(svgEl('line',{x1:pe.x,y1:pe.y,x2:plink.x,y2:plink.y,
+      stroke:isTransit?PLANETS[i].col:'#aaa','stroke-width':'0.7','stroke-opacity':'0.6'}));
+    // גליף
+    const pg=lonToXY(lon,r);
+    const col=isTransit?PLANETS[i].col:'#222';
+    svg.appendChild(svgEl('text',{x:pg.x,y:pg.y,'text-anchor':'middle','dominant-baseline':'middle',
+      'font-size':String(fontSize),'fill':col,'font-family':'serif','font-weight':'bold'},PLANETS[i].g));
+    // מעלה
+    const degNum=Math.floor(lon%30);
+    const pd=lonToXY(lon,r-fontSize-2);
+    svg.appendChild(svgEl('text',{x:pd.x,y:pd.y,'text-anchor':'middle','dominant-baseline':'middle',
+      'font-size':'8.5','fill':col},String(degNum)));
+    // Rx
+    if(data.retros[i]){
+      const pr=lonToXY(lon,r-fontSize-12);
+      svg.appendChild(svgEl('text',{x:pr.x,y:pr.y,'text-anchor':'middle','dominant-baseline':'middle',
+        'font-size':'8','fill':'#c02020','font-weight':'700'},'Rx'));
+    }
+  });
+}
+
+// ─── Main Transit Chart ───────────────────────────────────────────────────────
+let natalData={lons:[],retros:[]},transitData={lons:[],retros:[]},ascLon=0,mcLon=0,houses=[];
+
+function drawChart(){
+  const svg=document.getElementById('astroChart');
+  svg.innerHTML='';
+  drawZodiacBase(svg,'bg1');
+
+  // טבעת חיצונית לכוכבי מעבר
+  svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:R.to,fill:'none',stroke:'#999','stroke-width':'1'}));
+
+  // אזור כוכבי לידה (בין גלגל לטבעת פנימית)
+  svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:R.zi,fill:'rgba(255,255,255,0.6)',stroke:'#aaa','stroke-width':'0.8'}));
+
+  drawHouses(svg,houses,true);
+  drawAxisLabels(svg,ascLon);
+
+  // קווי אספקטים
+  calcAspects(natalData.lons,transitData.lons).forEach(({ni,ti,asp})=>{
+    const pn=lonToXY(natalData.lons[ni],R.ai),pt=lonToXY(transitData.lons[ti],R.ai);
+    const attrs={x1:pn.x,y1:pn.y,x2:pt.x,y2:pt.y,stroke:asp.col,'stroke-width':'1.6','stroke-opacity':'0.72'};
+    if(asp.dash) attrs['stroke-dasharray']='7,4';
+    svg.appendChild(svgEl('line',attrs));
+  });
+
+  // כוכבי לידה — בין גלגל לטבעת פנימית
+  drawPlanets(svg,natalData,R.np,R.zi,28,false);
+  // כוכבי מעבר — מחוץ לגלגל
+  drawPlanets(svg,transitData,R.tp,R.zo,30,true);
+
+  // מעגל מרכז
+  svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:10,fill:'#fff',stroke:'#999','stroke-width':'1.2'}));
+}
+
+// ─── Aspects ──────────────────────────────────────────────────────────────────
+function calcAspects(nLons,tLons){
+  const result=[];
+  tLons.forEach((tl,ti)=>{nLons.forEach((nl,ni)=>{
+    let diff=Math.abs(tl-nl);if(diff>180)diff=360-diff;
+    ASPECTS.forEach(asp=>{const orb=Math.abs(diff-asp.a);if(orb<=asp.orb)result.push({ni,ti,asp,orb,diff});});
+  });});
+  return result;
+}
+function calcNatalAspects(lons){
+  const result=[];
+  for(let i=0;i<lons.length;i++)for(let j=i+1;j<lons.length;j++){
+    let diff=Math.abs(lons[i]-lons[j]);if(diff>180)diff=360-diff;
+    ASPECTS.forEach(asp=>{const orb=Math.abs(diff-asp.a);if(orb<=asp.orb)result.push({pi:i,pj:j,asp,orb});});
+  }
+  return result;
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function lonToStr(lon){
+  const si=Math.floor(lon/30),deg2=lon%30,d=Math.floor(deg2),m=Math.floor((deg2-d)*60);
+  return{sign:SIGNS[si],deg:d,min:m,str:`${String(d).padStart(2,'0')}°${String(m).padStart(2,'0')}' ${SIGNS[si].n}`};
+}
+function getHouse(lon,asc){return Math.floor(((lon-asc+360)%360)/30)%12+1;}
+function calcLMST(jd){
+  const T=(jd-2451545)/36525;
+  const GMST=280.46061837+360.98564736629*(jd-2451545)+0.000387933*T*T-T*T*T/38710000;
+  // Equation of equinoxes (nutation correction for apparent sidereal time)
+  const omega=mod360(125.04452-1934.136261*T);
+  const L0=mod360(280.4665+36000.7698*T);
+  const L1=mod360(218.3165+481267.8813*T);
+  const eps=23.4393-0.013*T;
+  const dpsi=(-17.20*Math.sin(rad(omega))-1.32*Math.sin(rad(2*L0))-0.23*Math.sin(rad(2*L1))+0.21*Math.sin(rad(2*omega)))/3600;
+  const eqEq=dpsi*Math.cos(rad(eps));
+  return mod360(GMST+eqEq+parseFloat(document.getElementById('bLon').value));
+}
+
+function calcASC(jd,lat){
+  const T=(jd-2451545)/36525;
+  const LMST=calcLMST(jd);
+  const eps=rad(23.4393-0.013*T),lst=rad(LMST),la=rad(lat);
+  return mod360(deg(Math.atan2(-Math.cos(lst),Math.sin(lst)*Math.cos(eps)+Math.tan(la)*Math.sin(eps))));
+}
+
+// ─── Placidus House System ────────────────────────────────────────────────────
+function raToEcl(ra_deg, eps_deg){
+  // ממיר RA לאורך אקליפטי — atan2 מטפל בריבוע אוטומטית
+  const ra=rad(mod360(ra_deg));
+  return mod360(deg(Math.atan2(Math.sin(ra), Math.cos(rad(eps_deg))*Math.cos(ra))));
+}
+
+function calcPlacidus(ramc, lat, eps){
+  const sin_eps=Math.sin(rad(eps)), cos_eps=Math.cos(rad(eps));
+  const tan_phi=Math.tan(rad(lat));
+
+  // MC ו-ASC
+  const mc=mod360(deg(Math.atan2(Math.sin(rad(ramc)), Math.cos(rad(ramc))*cos_eps)));
+  const asc=mod360(deg(Math.atan2(-Math.cos(rad(ramc)),
+    sin_eps*tan_phi+cos_eps*Math.sin(rad(ramc)))));
+
+  // פתרון איטרטיבי לבית ביניים
+  // isDay=true → עביר יום (בתים 11,12) | isDay=false → עביר לילה (בתים 2,3)
+  // fraction: 1/3 או 2/3
+  function solve(fraction, isDay, guess){
+    let lam=guess;
+    for(let i=0;i<50;i++){
+      const delta=deg(Math.asin(sin_eps*Math.sin(rad(lam))));
+      const tp=tan_phi*Math.tan(rad(delta));
+      if(Math.abs(tp)>=1) return mod360(lam); // קוטבי — fallback
+      const ad=deg(Math.asin(tp));
+      // קשת יום/לילה + שבר
+      const arc=isDay?(90+ad):(90-ad);
+      const ra_target=isDay
+        ? ramc+fraction*arc
+        : ramc+180+fraction*arc;
+      const lam_new=raToEcl(ra_target, eps);
+      if(Math.abs(lam_new-lam)<0.0001){lam=lam_new;break;}
+      lam=lam_new;
+    }
+    return mod360(lam);
+  }
+
+  const h11=solve(1/3, true,  mod360(mc+22));
+  const h12=solve(2/3, true,  mod360(mc+52));
+  const h2 =solve(1/3, false, mod360(mc+202));
+  const h3 =solve(2/3, false, mod360(mc+232));
+
+  return [
+    asc,               // בית 1
+    h2,                // בית 2
+    h3,                // בית 3
+    mod360(mc+180),    // בית 4 (IC)
+    mod360(h11+180),   // בית 5
+    mod360(h12+180),   // בית 6
+    mod360(asc+180),   // בית 7 (DSC)
+    mod360(h2+180),    // בית 8
+    mod360(h3+180),    // בית 9
+    mc,                // בית 10 (MC)
+    h11,               // בית 11
+    h12,               // בית 12
+  ];
+}
+
+// בית לפי מערכת פעילה
+function getHouseBySystem(lon){
+  const hSys=document.getElementById('hSys').value;
+  if(hSys==='placidus'||hSys==='whole'){
+    // בדוק בין כל שני קאספים עוקבים
+    for(let i=0;i<12;i++){
+      const c1=houses[i], c2=houses[(i+1)%12];
+      const span=mod360(c2-c1);
+      const dist=mod360(lon-c1);
+      if(dist<span) return i+1;
+    }
+    return 1;
+  }
+  return getHouse(lon, houses[0]); // שווי
+}
+
+// ─── View Management ──────────────────────────────────────────────────────────
+let currentView='transit';
+let person2Data={lons:[],retros:[]},asc2Lon=0,houses2=[];
+
+function switchView(v){
+  document.querySelectorAll('.view').forEach(el=>el.style.display='none');
+  document.getElementById('view-'+v).style.display='';
+  document.querySelectorAll('[data-view]').forEach(a=>a.classList.remove('active'));
+  document.querySelectorAll(`[data-view="${v}"]`).forEach(a=>a.classList.add('active'));
+  currentView=v;
+  window.scrollTo({top:0,behavior:'smooth'});
+  renderCurrentView();
+}
+
+function renderCurrentView(){
+  if(currentView==='transit')renderTransitView();
+  else if(currentView==='natal')renderNatalView();
+  else if(currentView==='synastry')renderSynastryView();
+  else if(currentView==='forecast')renderForecastView();
+  else if(currentView==='horoscope')renderHoroscopeView();
+  else if(currentView==='subscription')renderSubscriptionView();
+}
+
+// ─── Date helpers ─────────────────────────────────────────────────────────────
+function getDate(p){
+  const y=document.getElementById(p+'Year').value;
+  const m=String(document.getElementById(p+'Month').value).padStart(2,'0');
+  const d=String(document.getElementById(p+'Day').value).padStart(2,'0');
+  return`${y}-${m}-${d}`;
+}
+
+// ─── Main recalc ──────────────────────────────────────────────────────────────
+function recalc(){
+  const bd=getDate('b');
+  const bh=parseInt(document.getElementById('bHour').value)||0;
+  const bmin=parseInt(document.getElementById('bMin').value)||0;
+  const utcOffset=parseFloat(document.getElementById('bUtc').value)||2;
+  const lat=parseFloat(document.getElementById('bLat').value)||32.82;
+  const [by,bm,bdd]=bd.split('-').map(Number);
+  const bjd=toJD(by,bm,bdd,bh-utcOffset,bmin);
+  const T=(bjd-2451545)/36525;
+  const eps=23.4393-0.013*T;
+
+  natalData=computeAllPlanets(bjd);
+  const ramc=calcLMST(bjd);
+
+  // ASC אסטרונומי + MC אמיתי
+  ascLon=calcASC(bjd,lat);
+  mcLon=mod360(deg(Math.atan2(Math.sin(rad(ramc)),Math.cos(rad(ramc))*Math.cos(rad(eps)))));
+
+  const hSys=document.getElementById('hSys').value;
+  if(hSys==='placidus'){
+    houses=calcPlacidus(ramc,lat,eps);
+    ascLon=houses[0];
+    mcLon=houses[9];
+  } else if(hSys==='whole'){
+    // מזל שלם — מתחיל מתחילת המזל של ה-ASC
+    const ascSign=Math.floor(ascLon/30);
+    houses=Array.from({length:12},(_,i)=>mod360(ascSign*30+i*30));
+  } else {
+    // שווי — ASC + 30° לכל בית
+    houses=Array.from({length:12},(_,i)=>mod360(ascLon+i*30));
+  }
+
+  renderCurrentView();
+}
+
+function renderTransitView(){
+  const td=getDate('t');
+  const [ty,tm,tdd]=td.split('-').map(Number);
+  transitData=computeAllPlanets(toJD(ty,tm,tdd,12,0));
+  drawChart();
+  buildTables();
+  generateReading();
+  const ds=lonToStr(transitData.lons[0]);
+  document.getElementById('sunInfo').textContent=`שמש: ${ds.sign.g} ${ds.sign.n} ${ds.deg}°`;
+  document.getElementById('tDateDisplay').textContent=td.split('-').reverse().join('/');
+}
+
+function buildTables(){
+  const nt=document.getElementById('natalTable');
+  nt.innerHTML='<tr><th>כוכב</th><th>מזל</th><th>מעלה</th><th>בית</th></tr>';
+  const nm=document.getElementById('natalMiniList');nm.innerHTML='';
+  natalData.lons.forEach((lon,i)=>{
+    const{sign,deg,min}=lonToStr(lon);const house=getHouseBySystem(lon);const rx=natalData.retros[i];
+    nt.innerHTML+=`<tr><td class="glyph-cell" style="color:${PLANETS[i].col}">${PLANETS[i].g}</td><td>${PLANETS[i].n}${rx?` <span class="retro">Rx</span>`:''}</td><td class="sign-glyph">${sign.g} ${sign.n} ${String(deg).padStart(2,'0')}°${String(min).padStart(2,'0')}'</td><td style="color:#a090ee">${house}</td></tr>`;
+    nm.innerHTML+=`<div class="planet-mini-row"><span class="planet-glyph" style="color:${PLANETS[i].col}">${PLANETS[i].g}</span><span class="planet-name-s">${PLANETS[i].n}</span><span class="planet-pos">${sign.g} ${String(deg).padStart(2,'0')}°${String(min).padStart(2,'0')}'</span>${rx?'<span class="planet-retro">Rx</span>':''}</div>`;
+  });
+  // ASC
+  {const{sign,deg,min}=lonToStr(ascLon);
+  nt.innerHTML+=`<tr style="background:rgba(160,118,38,0.05)"><td class="glyph-cell" style="color:#8a6010">↑</td><td style="color:#8a6010;font-weight:600">ASC</td><td class="sign-glyph">${sign.g} ${sign.n} ${String(deg).padStart(2,'0')}°${String(min).padStart(2,'0')}'</td><td style="color:#a090ee">1</td></tr>`;
+  nm.innerHTML+=`<div class="planet-mini-row"><span class="planet-glyph" style="color:#8a6010;font-size:13px">↑</span><span class="planet-name-s" style="color:#8a6010;font-weight:600">ASC</span><span class="planet-pos" style="color:#8a6010">${sign.g} ${String(deg).padStart(2,'0')}°${String(min).padStart(2,'0')}'</span></div>`;}
+  // DSC = האופק
+  {const dscLon=mod360(ascLon+180);const{sign,deg,min}=lonToStr(dscLon);
+  nt.innerHTML+=`<tr style="background:rgba(160,118,38,0.05)"><td class="glyph-cell" style="color:#556699">↓</td><td style="color:#556699;font-weight:600">DSC — האופק</td><td class="sign-glyph">${sign.g} ${sign.n} ${String(deg).padStart(2,'0')}°${String(min).padStart(2,'0')}'</td><td style="color:#a090ee">7</td></tr>`;
+  nm.innerHTML+=`<div class="planet-mini-row"><span class="planet-glyph" style="color:#556699;font-size:13px">↓</span><span class="planet-name-s" style="color:#556699;font-weight:600">האופק</span><span class="planet-pos" style="color:#556699">${sign.g} ${String(deg).padStart(2,'0')}°${String(min).padStart(2,'0')}'</span></div>`;}
+  const tt=document.getElementById('transitTable');
+  tt.innerHTML='<tr><th>כוכב</th><th>מזל</th><th>מעלה</th><th>Rx</th></tr>';
+  const tm2=document.getElementById('transitMiniList');tm2.innerHTML='';
+  transitData.lons.forEach((lon,i)=>{
+    const{sign,deg,min}=lonToStr(lon);const rx=transitData.retros[i];
+    tt.innerHTML+=`<tr><td class="glyph-cell" style="color:${PLANETS[i].col}">${PLANETS[i].g}</td><td>${PLANETS[i].n}</td><td class="sign-glyph">${sign.g} ${sign.n} ${String(deg).padStart(2,'0')}°${String(min).padStart(2,'0')}'</td><td>${rx?'<span class="retro">Rx</span>':''}</td></tr>`;
+    tm2.innerHTML+=`<div class="planet-mini-row"><span class="planet-glyph" style="color:${PLANETS[i].col}">${PLANETS[i].g}</span><span class="planet-name-s">${PLANETS[i].n}</span><span class="planet-pos">${sign.g} ${String(deg).padStart(2,'0')}°${String(min).padStart(2,'0')}'</span>${rx?'<span class="planet-retro">Rx</span>':''}</div>`;
+  });
+  const at=document.getElementById('aspectTable');
+  at.innerHTML='<tr><th>מעבר</th><th>זווית</th><th>נטלי</th><th>הפרש</th><th>מדויק</th></tr>';
+  const asps=calcAspects(natalData.lons,transitData.lons);
+  asps.sort((a,b)=>a.orb-b.orb).slice(0,40).forEach(({ni,ti,asp,orb})=>{
+    const tp=PLANETS[ti],np=PLANETS[ni];const exact=orb<0.5;
+    at.innerHTML+=`<tr${exact?' style="background:rgba(100,60,200,0.2)"':''}><td style="color:${tp.col}">${tp.g} ${tp.n}${transitData.retros[ti]?'<span class="retro"> Rx</span>':''}</td><td class="aspect-symbol ${asp.cls}" title="${asp.n}">${asp.g}</td><td style="color:${np.col}">${np.g} ${np.n}</td><td class="${orb<3?'orb-pos':'orb-neg'}">${orb.toFixed(1)}°</td><td>${exact?'✦':''}</td></tr>`;
+  });
+  if(!asps.length)at.innerHTML+='<tr><td colspan="5" style="text-align:center;color:#6050a0;padding:20px">אין זוויות משמעותיות</td></tr>';
+}
+
+function shiftDate(days){
+  const y=parseInt(document.getElementById('tYear').value);
+  const m=parseInt(document.getElementById('tMonth').value);
+  const d=parseInt(document.getElementById('tDay').value);
+  const cur=new Date(y,m-1,d);cur.setDate(cur.getDate()+days);
+  document.getElementById('tYear').value=cur.getFullYear();
+  document.getElementById('tMonth').value=cur.getMonth()+1;
+  document.getElementById('tDay').value=cur.getDate();
+  recalc();
+}
+
+// ─── Reading Data ─────────────────────────────────────────────────────────────
+const SIGN_EL_HE={fire:'אש',earth:'אדמה',air:'אוויר',water:'מים'};
+
+// ─── ארכיטיפ המזלות — לפי "לומדים אסטרולוגיה עם מגי אדם" ──────────────────
+const SIGN_ARCHETYPE=[
+  {n:'טלה',   el:'אש',   mod:'קרדינלי', ruler:'מאדים',          theme:'יוזמה, אומץ ועצמאות', shadow:'חיפזון ואגואיזם', key:'נלהב, ישיר, יוזם, תחרותי'},
+  {n:'שור',   el:'אדמה', mod:'קבוע',    ruler:'נוגה',            theme:'יציבות, חושניות וביטחון חומרי', shadow:'עקשנות ותאוות בצע', key:'אמין, סבלני, חושני, עקשן'},
+  {n:'תאומים',el:'אוויר',mod:'הדדי',   ruler:'מרקורי',          theme:'תקשורת, גמישות ורעיונות', shadow:'שטחיות ואי-עקביות', key:'סקרן, רהוט, גמיש, דואלי'},
+  {n:'סרטן',  el:'מים',  mod:'קרדינלי', ruler:'ירח',             theme:'ביתיות, טיפוח ואינטואיציה', shadow:'היאחזות ופחד מנטישה', key:'מטפח, אינטואיטיבי, ביתי, רגשי'},
+  {n:'אריה',  el:'אש',   mod:'קבוע',    ruler:'שמש',             theme:'ביטוי עצמי, יצירה ונדיבות', shadow:'גאוותנות וצורך בהכרה', key:'יצירתי, נדיב, בולט, דרמטי'},
+  {n:'בתולה', el:'אדמה', mod:'הדדי',   ruler:'מרקורי',          theme:'דיוק, שירות ושלמות', shadow:'ביקורתיות ופרפקציוניזם', key:'מדויק, שיטתי, שרותי, ביקורתי'},
+  {n:'מאזניים',el:'אוויר',mod:'קרדינלי',ruler:'נוגה',           theme:'שותפות, איזון ויופי', shadow:'חוסר החלטיות ותלות', key:'הוגן, דיפלומטי, אסתטי, מהסס'},
+  {n:'עקרב',  el:'מים',  mod:'קבוע',    ruler:'מאדים / פלוטו',  theme:'טרנספורמציה, עומק ועוצמה', shadow:'שליטה, קינאה וחשדנות', key:'עמוק, עצמתי, חוקר, אינטנסיבי'},
+  {n:'קשת',   el:'אש',   mod:'הדדי',   ruler:'צדק',             theme:'חירות, אמת ופילוסופיה', shadow:'חוסר מחויבות וחוצפה', key:'אופטימי, פילוסופי, הרפתקן, ישיר'},
+  {n:'גדי',   el:'אדמה', mod:'קרדינלי', ruler:'שבתאי',          theme:'שאפתנות, מבנה ואחריות', shadow:'קרירות ופחד מכישלון', key:'שאפתן, אחראי, ממושמע, קר'},
+  {n:'דלי',   el:'אוויר',mod:'קבוע',   ruler:'שבתאי / אורנוס', theme:'חדשנות, אנושיות ועצמאות', shadow:'ניכור וריחוק רגשי', key:'חדשני, הומניסטי, מקורי, מנותק'},
+  {n:'דגים',  el:'מים',  mod:'הדדי',   ruler:'צדק / נפטון',    theme:'חמלה, רוחניות וגבולות נזילים', shadow:'בריחה ממציאות', key:'אמפתי, חולמני, רוחני, חסר גבולות'},
+];
+
+// ─── בתים אסטרולוגיים — לפי "לומדים אסטרולוגיה עם מגי אדם" ────────────────
+const HOUSE_DESC=[
+  {n:1, title:'בית 1 — הזהות והאופק (ASC)',
+   text:'הזהות האישית, המראה החיצוני, האופן שאתה מציג את עצמך לעולם. מזל הלאגנה מעצב את הגישה לחיים. כוכב כאן מקבל ביטוי חזק ומיידי.',
+   axis:'ציר 1–7: עצמי מול שותפות'},
+  {n:2, title:'בית 2 — הכסף והערכים',
+   text:'משאבים אישיים, הכנסה, רכוש ומה שאתה מייחס לו ערך — כולל ביטחון עצמי חומרי.',
+   axis:'ציר 2–8: משאבים אישיים מול משאבים משותפים'},
+  {n:3, title:'בית 3 — תקשורת ואחים',
+   text:'תקשורת יומיומית, דרך הביטוי, אחים, שכנים, נסיעות קצרות ולמידה בסיסית.',
+   axis:'ציר 3–9: ידע קרוב מול חוכמה ורחב'},
+  {n:4, title:'בית 4 — הבית והשורשים',
+   text:'בית ומשפחה, ילדות ושורשים, "האם" הפנימית, תחתית הנשמה. כוכב כאן מגדיר את הקשר עם העבר ותחושת הבית.',
+   axis:'ציר 4–10: בית ומשפחה מול קריירה ומעמד'},
+  {n:5, title:'בית 5 — יצירה ואהבה',
+   text:'יצירתיות, ביטוי אישי, אהבה רומנטית, ילדים, משחק והנאה. כוכב כאן מגדיר את הדרך שבה אתה שמח ויוצר.',
+   axis:'ציר 5–11: ביטוי אישי מול קהילה'},
+  {n:6, title:'בית 6 — עבודה ובריאות',
+   text:'עבודה יומיומית, שגרה, בריאות גוף ונפש ושירות לאחרים. כוכב כאן משפיע על איכות היומיום.',
+   axis:'ציר 6–12: שגרה ובריאות מול רוחניות ונסתר'},
+  {n:7, title:'בית 7 — שותפות וזוגיות',
+   text:'נישואין, שותפויות, יחסים זוגיים, חוזים. מה שאתה מחפש ומושך אל חייך. הציר מול הלאגנה.',
+   axis:'ציר 7–1: שותפות מול עצמי'},
+  {n:8, title:'בית 8 — טרנספורמציה',
+   text:'שינוי עמוק, מוות ולידה מחדש, ירושות, כסף משותף, מיסתורין. כוכב כאן קשור לשינויים גדולים בחיים.',
+   axis:'ציר 8–2: משאבים משותפים מול אישיים'},
+  {n:9, title:'בית 9 — פילוסופיה ואמונות',
+   text:'אמונות, פילוסופיה, נסיעות רחוקות, השכלה גבוהה, חוק ורוחניות. כוכב כאן מעצב את תפיסת העולם.',
+   axis:'ציר 9–3: חוכמה ורחב מול ידע קרוב'},
+  {n:10,title:'בית 10 — קריירה ומעמד',
+   text:'קריירה ומוניטין, שאיפות ומעמד חברתי, ה-MC (גג המפה). כוכב כאן בולט בציבור ומשפיע על הנתיב המקצועי.',
+   axis:'ציר 10–4: קריירה ומעמד מול בית ומשפחה'},
+  {n:11,title:'בית 11 — קהילה וחלומות',
+   text:'חברים, קבוצות וקהילות, חלומות לעתיד, שאיפות חברתיות. כוכב כאן מגדיר את המעגל החברתי.',
+   axis:'ציר 11–5: קהילה מול ביטוי אישי'},
+  {n:12,title:'בית 12 — הנסתר והרוחני',
+   text:'תת-מודע, בדידות ובידוד, רוחניות ומדיטציה, קארמה ועניינים נסתרים. כוכב כאן פועל לרוב מאחורי הקלעים.',
+   axis:'ציר 12–6: נסתר ורוחני מול שגרה ובריאות'},
+];
+
+const MODALITY_DESC={
+  cardinal:'קרדינלי — יוזם ומתחיל. אנרגיית פתיחת מחזורים, הובלה ופעולה ראשונית.',
+  fixed:   'קבוע — מגשים ועמיד. אנרגיית ביצוע, התמדה ועמידה בקו לאורך זמן.',
+  mutable: 'הדדי — מסתגל ומשלים. אנרגיית גמישות, שינוי ומעבר בין מצבים.',
+};
+
+const PLANET_IN_SIGN=[
+  // שמש — זהות ורצון חיים
+  ['השמש בטלה (אש קרדינלית, שליט מאדים) — אישיות נלהבת, ישירה ויוזמת. חיים מלאי תשוקה ואומץ. מתנה: מנהיגות ויוזמה. אתגר: חיפזון ואגואיזם.',
+   'השמש בשור (אדמה קבועה, שליטה נוגה) — נחישות, סבלנות ושאיפה ליציבות חומרית. בונה לאורך זמן ומוצא שמחה בחושניות. מתנה: אמינות ויציבות. אתגר: עקשנות.',
+   'השמש בתאומים (אוויר הדדי, שליט מרקורי) — סקרנות רחבה, ביטוי מגוון וגמישות מחשבתית. חי בעולם הרעיונות. מתנה: רהיטות ותקשורת. אתגר: שטחיות ופיזור.',
+   'השמש בסרטן (מים קרדינליים, שליטה ירח) — רגישות עמוקה, ביתיות ואינטואיציה. יוזם מתוך הרגש ומחפש שייכות. מתנה: אמפתיה ועומק. אתגר: היאחזות.',
+   'השמש באריה (אש קבועה, שליטה שמש) — יצירתיות, נדיבות ואהבה לביטוי עצמי. מביע את עצמו בגדולה. מתנה: יצירה ומנהיגות לב. אתגר: גאוותנות.',
+   'השמש בבתולה (אדמה הדדית, שליט מרקורי) — שאיפה לשלמות, שירות ודיוק. מבחין בפרטים שאחרים מפספסים. מתנה: ארגון ושירות. אתגר: ביקורתיות עצמית.',
+   'השמש במאזניים (אוויר קרדינלי, שליטה נוגה) — הוגנות, אסתטיקה ושאיפה לשותפות. יוזם קשרים ומחפש הרמוניה. מתנה: דיפלומטיה ויופי. אתגר: חוסר החלטיות.',
+   'השמש בעקרב (מים קבועים, שליט מאדים/פלוטו) — עצמה, עומק ואינטנסיביות. חוקר את הנסתר ומחפש טרנספורמציה. מתנה: כוח פנימי ועומק. אתגר: שליטה וחשדנות.',
+   'השמש בקשת (אש הדדית, שליט צדק) — אופטימיות, חירות ואהבת פילוסופיה. מחפש משמעות ורוחב. מתנה: אמונה ואופק רחב. אתגר: חוסר מחויבות.',
+   'השמש בגדי (אדמה קרדינלית, שליט שבתאי) — שאפתנות, משמעת ובנייה לטווח ארוך. יוזם הישגים ומחפש מעמד. מתנה: אחריות ומנהיגות. אתגר: קרירות ופחד מכישלון.',
+   'השמש בדלי (אוויר קבוע, שליט שבתאי/אורנוס) — חדשנות, מקוריות ואהבת האנושות. חושב מחוץ לקופסה. מתנה: ראייה לעתיד ומקוריות. אתגר: ניכור וריחוק.',
+   'השמש בדגים (מים הדדיים, שליט צדק/נפטון) — חמלה, רוחניות ורגישות עמוקה. חי בין העולמות. מתנה: אמפתיה ורוחניות. אתגר: בריחה ממציאות.'],
+  // ירח — רגש ואינטואיציה
+  ['הירח בטלה — תגובות רגשיות ספונטניות, עצמאות ואנרגיה. הרגש מזין פעולה. אתגר: חיפזון רגשי.',
+   'הירח בשור — ביתיות רגשית ויציבות עמוקה. הנשמה מחפשת נוחות, יופי וחיבור חושי. אתגר: היאחזות.',
+   'הירח בתאומים — עיבוד רגשי דרך מחשבה ומילים. הרגש זקוק לביטוי מילולי. אתגר: קושי לשבת עם הרגש.',
+   'הירח בסרטן — מיקום טבעי. רגישות עמוקה, אינטואיציה חזקה, אהבת ביתיות. אתגר: היאחזות ורגישות יתר.',
+   'הירח באריה — רגשות עוצמתיים ובוערים, צורך בביטוי רגשי חופשי. אתגר: עצבנות ותגובות מהירות.',
+   'הירח בבתולה — עיבוד רגשי דרך ניתוח ומעשיות. הרגש מוצא ביטוי בדאגה לפרטים. אתגר: ביקורת עצמית.',
+   'הירח במאזניים — צורך חזק בהרמוניה ובמערכות יחסים. הרגש פורח בנוכחות האחר. אתגר: אובדן עצמי.',
+   'הירח בעקרב — עומק רגשי אדיר ועצמה. אינטואיציה חדה ורגשות אינטנסיביים. אתגר: קינאה ועצמה מוגזמת.',
+   'הירח בקשת — רגשות חופשיים ואופטימיים. הנפש זקוקה לחירות והרפתקה. אתגר: קושי במחויבות רגשית.',
+   'הירח בגדי — שליטה עצמית רגשית ומיקוד. הרגש מוצא ביטוי דרך הישגים. אתגר: קירור רגשות.',
+   'הירח בדלי — רגשות ייחודיים ובלתי שגרתיים. נטייה לאינטלקטואליזציה. אתגר: ניתוק מהרגש הגולמי.',
+   'הירח בדגים — אמפתיה עמוקה ורוחניות. הנפש ספוגה באנרגיות הסביבה. אתגר: גבולות נזילים.'],
+  // מרקורי — מחשבה ותקשורת
+  ['מרקורי בטלה — חשיבה ישירה, מהירה ופרקטית. ביטוי חד-משמעי. אתגר: חיפזון בהחלטות.',
+   'מרקורי בשור — חשיבה ממוקדת ומעשית. עיבוד איטי אך עמוק, זיכרון מצוין. אתגר: עקשנות בדעות.',
+   'מרקורי בתאומים — רב-ממדי, רהוט ומחובר. מיקומו הטבעי. אתגר: פיזור ומחשבות מרוצות.',
+   'מרקורי בסרטן — חשיבה אינטואיטיבית ורגשית. זיכרון רגשי מעולה. אתגר: מצב-רוח משפיע על חשיבה.',
+   'מרקורי באריה — ביטוי יצירתי ומבריק. רעיונות גדולים ואנרגטיים. אתגר: ביצוע לא תמיד עומד בגובה הרעיון.',
+   'מרקורי בבתולה — ניתוח מדויק ושיטתי. מיקומו הטבעי. אתגר: ביקורתיות יתר ודיוק מוגזם.',
+   'מרקורי במאזניים — חשיבה מאוזנת ודיפלומטית. רואה כל הצדדים. אתגר: אי-החלטיות ממושכת.',
+   'מרקורי בעקרב — חשיבה עמוקה, חקירתית וחדה. אתגר: חשדנות ונטייה לסודיות.',
+   'מרקורי בקשת — חשיבה פילוסופית ורחבה. אוהב רעיונות גדולים. אתגר: חוסר סבלנות לפרטים.',
+   'מרקורי בגדי — חשיבה מעשית, יעילה ומאורגנת. אתגר: קושי בחשיבה גמישה.',
+   'מרקורי בדלי — חשיבה חדשנית ועתידנית. קופץ מרעיון לרעיון. אתגר: חוסר קרקע.',
+   'מרקורי בדגים — חשיבה אינטואיטיבית ויצירתית. שפת דימויים. אתגר: קושי בדיוק עובדתי.'],
+  // נוגה — אהבה ויחסים
+  ['נוגה בטלה — אהבה ספונטנית, ישירה ונלהבת.',
+   'נוגה בשור — גבוהה. אהבה חושנית, יציבה ואמינה עם נאמנות ויופי.',
+   'נוגה בתאומים — אהבה שיחתית, מגוונת ואינטלקטואלית.',
+   'נוגה בסרטן — אהבה מטפחת, מגנה ועמוקה רגשית.',
+   'נוגה באריה — אהבה גאה, נדיבה ודרמטית.',
+   'נוגה בבתולה — אהבה עדינה, מתמסרת, עם תשומת לב ודאגה מעשית.',
+   'נוגה במאזניים — גבוהה ביותר. הרמוניה, יופי ויחסים מושלמים.',
+   'נוגה בעקרב — אהבה עמוקה, אינטנסיבית ועוצמתית.',
+   'נוגה בקשת — אהבה חופשית, הרפתקנית ופילוסופית.',
+   'נוגה בגדי — אהבה מחויבת, רצינית ובנייה לאורך זמן.',
+   'נוגה בדלי — אהבה ייחודית, מקורית ומחוץ לקונבנציה.',
+   'נוגה בדגים — גבוהה. אהבה רוחנית, חלומית ועמוקה.'],
+  // מאדים — אנרגיה ופעולה
+  ['מאדים בטלה — גבוה ביותר. אנרגיה פורצת, ישירות ונחישות ללא פשרות.',
+   'מאדים בשור — אנרגיה איטית-עקשנית. שיטתי, עמיד ומתמיד.',
+   'מאדים בתאומים — אנרגיה מגוונת ומהירה. ריבוי יוזמות בו-זמנית.',
+   'מאדים בסרטן — אנרגיה הגנתית. פועל חזק כשמגנים על היקרים.',
+   'מאדים באריה — אנרגיה יצירתית ולבבית, מכוונת לביטוי.',
+   'מאדים בבתולה — אנרגיה מכוונת ומדויקת. עובד קשה לפרטים.',
+   'מאדים במאזניים — מחפש צדק ושיתוף פעולה. אנרגיה בתוך קשרים.',
+   'מאדים בעקרב — גבוה. אנרגיה עמוקה, עצמתית ולא מתפשרת.',
+   'מאדים בקשת — אנרגיה הרפתקנית, ישירה ואופטימית.',
+   'מאדים בגדי — שאפתנות ועבודה קשה. ממוקד בהישגים ארוכי-טווח.',
+   'מאדים בדלי — אנרגיה חדשנית, עצמאית ולמען קהילה.',
+   'מאדים בדגים — אנרגיה זורמת, רגשית ורוחנית.'],
+  ['צדק בטלה — הזדמנויות פורצות. מחזור חדש.','צדק בשור — מזל כלכלי ויציב.','צדק בתאומים — הרחבת תקשורת ולמידה.','צדק בסרטן — ברכה בבית ומשפחה.','צדק באריה — מזל ויצירה.','צדק בבתולה — שיפור בריאות ועבודה.','צדק במאזניים — מזל ביחסים ובשותפויות.','צדק בעקרב — עומק ועוצמה. מזל טרנספורמטיבי.','צדק בקשת — ביתו של צדק. שנה של גדילה.','צדק בגדי — הצלחה מקצועית. בנו לטווח.','צדק בדלי — חדשנות ואנושיות.','צדק בדגים — רוחניות ורגישות. מתנות.'],
+  ['שבתאי בטלה — מבחן הזהות.','שבתאי בשור — מבחן המשאבים. בנו ביסוד.','שבתאי בתאומים — מבחן התקשורת.','שבתאי בסרטן — מבחן הרגש.','שבתאי באריה — מבחן הקיום.','שבתאי בבתולה — מבחן הבריאות.','שבתאי במאזניים — מבחן הקשרים.','שבתאי בעקרב — מבחן העמוק. טרנספורמציה.','שבתאי בקשת — מבחן הערכים.','שבתאי בגדי — ביתו של שבתאי. עבדו קשה.','שבתאי בדלי — מבחן החברה.','שבתאי בדגים — מבחן הנפש.'],
+  ['אורנוס בטלה — מהפכה אישית.','אורנוס בשור — מהפכה כלכלית.','אורנוס בתאומים — מהפכת תקשורת.','אורנוס בסרטן — מהפכה ביתית.','אורנוס באריה — מהפכת זהות.','אורנוס בבתולה — מהפכה בשגרה.','אורנוס במאזניים — מהפכת קשרים.','אורנוס בעקרב — מהפכה פנימית.','אורנוס בקשת — מהפכת ערכים.','אורנוס בגדי — מהפכת מוסדות.','אורנוס בדלי — ביתו של אורנוס.','אורנוס בדגים — מהפכת הנפש.'],
+  ['נפטון בטלה — ערפל הזהות.','נפטון בשור — ערפל כלכלי. זהירות.','נפטון בתאומים — ערפל תקשורת.','נפטון בסרטן — חלומות ביתיים.','נפטון באריה — חלומות גדולים.','נפטון בבתולה — ריפוי אלטרנטיבי.','נפטון במאזניים — חלומות זוגיים.','נפטון בעקרב — טרנספורמציה רוחנית.','נפטון בקשת — פילוסופיה רוחנית.','נפטון בגדי — חלומות קריירה.','נפטון בדלי — חלומות חברתיים.','נפטון בדגים — ביתו של נפטון. שיא הרוחניות.'],
+  ['פלוטו בטלה — טרנספורמציה עמוקה של הזהות.','פלוטו בשור — טרנספורמציה כלכלית.','פלוטו בתאומים — טרנספורמציה מחשבתית.','פלוטו בסרטן — טרנספורמציה רגשית.','פלוטו באריה — טרנספורמציה יצירתית.','פלוטו בבתולה — טרנספורמציה בריאותית.','פלוטו במאזניים — טרנספורמציה חברתית.','פלוטו בעקרב — ביתו של פלוטו. עוצמה ושינוי.','פלוטו בקשת — טרנספורמציה פילוסופית.','פלוטו בגדי — טרנספורמציה במוסדות.','פלוטו בדלי — טרנספורמציה חברתית.','פלוטו בדגים — טרנספורמציה רוחנית עמוקה.'],
+  // כירון
+  ['כירון בטלה — ריפוי פצע הזהות והביטחון העצמי.','כירון בשור — ריפוי פצע הכסף והערך העצמי.','כירון בתאומים — ריפוי פצע התקשורת והביטוי.','כירון בסרטן — ריפוי פצע הבית והאם.','כירון באריה — ריפוי פצע היצירה והלב.','כירון בבתולה — ריפוי פצע השלמות והביקורת.','כירון במאזניים — ריפוי פצע הקשרים והשיוויון.','כירון בעקרב — ריפוי פצע עמוק ושינוי מהשורש.','כירון בקשת — ריפוי פצע האמונה והמשמעות.','כירון בגדי — ריפוי פצע הסמכות וההצלחה.','כירון בדלי — ריפוי פצע השייכות לקהילה.','כירון בדגים — ריפוי פצע הנשמה והאמפתיה.'],
+  // צומת צפוני
+  ['ראש דרקון בטלה — נתיב הנשמה: פיתוח אומץ ועצמאות.','ראש דרקון בשור — נתיב הנשמה: יציבות חומרית ורוחנית.','ראש דרקון בתאומים — נתיב הנשמה: סקרנות ותקשורת.','ראש דרקון בסרטן — נתיב הנשמה: טיפוח ומשפחה.','ראש דרקון באריה — נתיב הנשמה: יצירה ושמחה.','ראש דרקון בבתולה — נתיב הנשמה: שירות ובריאות.','ראש דרקון במאזניים — נתיב הנשמה: שותפות ואיזון.','ראש דרקון בעקרב — נתיב הנשמה: טרנספורמציה ועומק.','ראש דרקון בקשת — נתיב הנשמה: חכמה ורוחניות.','ראש דרקון בגדי — נתיב הנשמה: מנהיגות ומבנה.','ראש דרקון בדלי — נתיב הנשמה: חדשנות ואנושיות.','ראש דרקון בדגים — נתיב הנשמה: חמלה ורוחניות.'],
+  // צומת דרומי
+  ['זנב דרקון בטלה — כישורי עבר: עצמאות ומנהיגות.','זנב דרקון בשור — כישורי עבר: יציבות ונחישות.','זנב דרקון בתאומים — כישורי עבר: חשיבה ותקשורת.','זנב דרקון בסרטן — כישורי עבר: רגישות ואינטואיציה.','זנב דרקון באריה — כישורי עבר: יצירתיות ותשוקה.','זנב דרקון בבתולה — כישורי עבר: ניתוח ודיוק.','זנב דרקון במאזניים — כישורי עבר: שיתוף פעולה.','זנב דרקון בעקרב — כישורי עבר: עוצמה ותחקיר.','זנב דרקון בקשת — כישורי עבר: פילוסופיה ואמונה.','זנב דרקון בגדי — כישורי עבר: משמעת ועבודה.','זנב דרקון בדלי — כישורי עבר: חדשנות ומהפכה.','זנב דרקון בדגים — כישורי עבר: רוחניות ואמפתיה.']
+];
+
+const PLANET_DOMAINS_M={
+  'שמש':    'הזהות, הביטחון העצמי וכוח הרצון שלך',
+  'ירח':    'העולם הרגשי, האינטואיציה והחיים המשפחתיים שלך',
+  'מרקורי': 'החשיבה, התקשורת והתכנון שלך',
+  'נוגה':   'האהבה, היחסים והשפע הכלכלי שלך',
+  'מאדים':  'הפעולה, האנרגיה והתשוקה שלך',
+  'צדק':    'הצמיחה, המזל וההצלחה שלך',
+  'שבתאי':  'המבנה, האחריות והבנייה לאורך זמן שלך',
+  'אורנוס': 'השינוי הפתאומי, החירות והחדשנות שלך',
+  'נפטון':  'החלומות, הרוחניות וההשראה שלך',
+  'פלוטו':  'הטרנספורמציה, הכוח העמוק והשינוי מהשורש שלך',
+  'כירון':  'הפצע הנסתר, הריפוי העמוק והחוכמה שרכשת',
+  'ראש דרקון':'הייעוד, הגורל וה"לאן" שלך',
+  'זנב דרקון':'ה"מאין", הדפוסים הישנים והשחרור שלך',
+};
+
+const FORECAST_READINGS={
+  // ── שבתאי ──────────────────────────────────────────────────────────────
+  'שבתאי|0|שמש':  'שבתאי מתמזג עם שמשך הנטלי — זהו רגע מכונן של חישוב חשבון. אתה עומד מול השאלה: מה בנית בחייך ומה אתה רוצה להמשיך לבנות? שבתאי אינו מרחם, אבל כל מה שתבנה תחת השפעתו יישאר לאורך זמן. קח את המחויבות הגדולה שדחית — הגיע הזמן.',
+  'שבתאי|0|ירח':  'שבתאי מתיישב על ירחך הנטלי — משקל רגשי ותחושת אחריות כבדה צפים. אולי יחסים מחפשים מבנה, אולי הרגשות עצמם זקוקים לגבולות. זהו זמן לעיבוד פנימי כנה ולא לבריחה. מה שתריצו דרכו כאן ייצא מנוקה ואמיתי.',
+  'שבתאי|0|נוגה': 'שבתאי מתמזג עם נוגה הנטלית שלך — יחסים ואהבה נבחנים בצורה עמוקה. מה שעומד בפני שאלות הזמן והמחויבות יישאר; מה שלא — יתפרק. אבל מה שישרוד יהיה אמיתי לחלוטין. אל תפחד מהשאלות הקשות.',
+  'שבתאי|0|מרקורי':'שבתאי מתמזג עם מרקורי הנטלי שלך — המחשבה מואטת ומעמיקה. דברים שנאמרו בקלות רוח עוברים בחינה מחדש. זהו זמן מצוין לכתיבה רצינית, לתכנון ארוך טווח ולשיחות משמעותיות — לא לשטחיות.',
+  'שבתאי|0|מאדים': 'שבתאי מתמזג עם מאדים הנטלי שלך — האנרגיה לא נעלמת, היא מתמרנת. מה שהיה אימפולסיבי הופך אסטרטגי. זה לא הזמן להסתערות, אלא לתכנון מדויק של הפעולה הבאה. הכוח הזה יהיה ממוקד ועוצמתי.',
+  'שבתאי|1|שמש':  'שבתאי פותח הזדמנות דרך שמשך הנטלי — פרי מוצק מחכה למי שיפעל בסבלנות. פרויקטים ארוכי טווח מקבלים גב, קריירה מתחזקת. הרחיבו את הרשת המקצועית — הזמן עובד לטובתכם.',
+  'שבתאי|2|שמש':  'שבתאי יוצר מתח עם שמשך הנטלי — שאלות קשות על מי אתה ומה עשית עם חייך. חסמים מקצועיים, בריאותיים או אחרים עשויים "לעצור את הרוח". שבתאי לא מהרס — הוא מגדיר מחדש. מה שלא עובד יפרק; מה שחייב להיבנות יצמח.',
+  'שבתאי|2|ירח':  'שבתאי לוחץ על ירחך הנטלי — רגשות ומחויבויות בעימות. צרכים רגשיים שהודחקו עלולים לצוף, קונפליקטים עם דמויות סמכות אפשריים. השתמשו בזמן הזה לריפוי אמיתי — לא לדכדוך.',
+  'שבתאי|2|נוגה': 'שבתאי מאתגר את נוגה הנטלית שלך — יחסים, כסף ויופי נכנסים לבדיקה. כמה עולה לך יחס מסוים? האם אתה שווה מה שאתה מאמין? השאלות הקשות האלה הן בעצם שאלות ריפוי. מה שתשמור מהתקופה הזאת יהיה מוצק ואמין.',
+  'שבתאי|3|שמש':  'שבתאי זורם בהרמוניה עם שמשך הנטלי — זמן של בנייה מלאת גב. ביסוס קריירה, מוניטין ומעמד — הכל מתחזק. ה"עבודה הקשה" שעשית בשנים קודמות מתחילה לתת פירות. הצעד הגדול הבא מקבל תמיכה.',
+  'שבתאי|3|ירח':  'שבתאי ממלא ברכה את ירחך הנטלי — יציבות רגשית, ביסוס בית ומשפחה. דברים שנחשבו לא יציבים מוצאים את מקומם. זה הזמן לשרטט את המשפחה והבית שאתה רוצה לבנות.',
+  'שבתאי|4|שמש':  'שבתאי עומד מול שמשך הנטלי — קרב בין מה שהעולם דורש ממך לבין מי שאתה בפנים. קשרים, עבודה, גיל — כולם נמדדים מחדש. אל תיפול ל"כולם יודעים מה טוב לי". האיזון האמיתי יגיע מתוכך.',
+
+  // ── צדק ────────────────────────────────────────────────────────────────
+  'צדק|0|שמש':  'צדק מתמזג עם שמשך הנטלי — שנת "הזהב" שלך. אנרגיה גבוהה, ביטחון עצמי, הזדמנויות מכל כיוון. זהו אחד הזמנים הטובים ביותר לקדם פרויקטים, לבקש העלאה, לפתוח עסק, לפרסם. הרחב את הגבולות — הכוכבים תומכים במלואם.',
+  'צדק|0|ירח':  'צדק מתמזג עם ירחך הנטלי — לב פתוח, שמחה אמיתית, קשרים מתחממים. יחסים משפחתיים מתחזקים, הבית מתחדש. הנפש רוצה לאהוב ולקבל אהבה — תנו לזה לקרות.',
+  'צדק|0|נוגה':  'צדק מתמזג עם נוגה הנטלית שלך — תקופה מבורכת ביחסים, בכסף ובשמחה. אהבה חדשה יכולה להגיע, שיפור כלכלי אפשרי. עיניים פתוחות לשפע.',
+  'צדק|0|מרקורי':'צדק מתמזג עם מרקורי הנטלי שלך — המחשבה מתרחבת, הרעיונות גדולים. תקשורת מוצלחת, לימודים, נסיעות, חוזים — הכל נתמך. כתבו את הספר, הציגו את הרעיון, שלחו את ההצעה.',
+  'צדק|0|מאדים': 'צדק מתמזג עם מאדים הנטלי שלך — אנרגיה אדירה ומוטיבציה בשיאם. פרויקטים תובעניים, יוזמות עסקיות, ופעילות גופנית — הכל בשיא.',
+  'צדק|1|שמש':  'צדק פותח הזדמנות דרך שמשך הנטלי — תנאים נוחים לצמיחה. עצמה, ביטחון ומזל עובדים לטובתכם. פעלו בכוונה ותנצלו את החלון.',
+  'צדק|2|שמש':  'צדק מאתגר את שמשך הנטלי — אנרגיה עצומה שמחפשת מוצא. שמרו מהגזמה, בזבוז וציפיות לא ריאליות. כוונו את ההתלהבות הזאת נכון ותצאו מורווחים.',
+  'צדק|3|שמש':  'צדק ממלא ברכה את שמשך הנטלי — גל של אופטימיות ואפשרויות. דלתות נפתחות, אנשים מוכנים לסייע. הזמן לפרסם, ליצור קשרים ולחלום בגדול — אל תצנזרו את עצמכם.',
+  'צדק|3|ירח':  'צדק מברך את ירחך הנטלי — שלווה רגשית, אושר בית, קשרים חמים. הנפש מתחדשת. הזמן לטפח את מה שאהוב עליך.',
+  'צדק|3|נוגה':  'צדק מברך את נוגה הנטלית שלך — שפע ביחסים ובכסף. הזמן הנכון לבקש, לקבל ולחוות שמחה. אהבה קיימת מתמלאת, אהבה חדשה יכולה להופיע.',
+  'צדק|4|שמש':  'צדק מתמקם מול שמשך הנטלי — בצד השני של המתח הזה מחכה פרס. בדקו האם הרחבתם מדי ואיזנו חזרה עם כוונה.',
+
+  // ── פלוטו ──────────────────────────────────────────────────────────────
+  'פלוטו|0|שמש':  'פלוטו מתמזג עם שמשך הנטלי — זהו מעבר רב-שנים ודרמטי. הזהות עוברת מוות ולידה מחדש. מה שהיית בעבר כבר לא מספיק — כוכב זה מבקש עוד. זהו כאב אמיתי, אבל הכוח שיצא מהתהליך הזה יהיה שונה ועמוק ממה שהכרת.',
+  'פלוטו|0|ירח':  'פלוטו מתיישב על ירחך הנטלי — שינוי עמוק בעולם הרגשי והמשפחתי. דפוסים ישנים מהילדות נשברים. הריפוי עלול להכאיב, אבל האדם שיצא מהצד השני יהיה חופשי ואמיתי הרבה יותר.',
+  'פלוטו|0|נוגה':  'פלוטו מתמזג עם נוגה הנטלית שלך — מהפכה ביחסים ובאהבה. יחסים ישנים "מתים" או מתחדשים מהשורש. תשוקות עמוקות מגיחות. אל תפחדו מהעוצמה הזאת — היא נועדה לרפא.',
+  'פלוטו|2|שמש':  'פלוטו מאתגר את שמשך הנטלי — כוחות חיצוניים מאיימים, קרבות כוח ושינויים מאולצים. אל תנסו לשלוט במה שלא ניתן לשליטה. ספרו מה אתם יכולים לשנות — וקחו שליטה שם.',
+  'פלוטו|2|ירח':  'פלוטו לוחץ על ירחך הנטלי — גלים רגשיים עוצמתיים. דברים ממשפחה, עבר ודפוסי ילדות צפים. זה לא נעים — אבל ריפוי אמיתי ממתין בצד השני.',
+  'פלוטו|3|שמש':  'פלוטו זורם עם שמשך הנטלי — כוח טרנספורמטיבי תומך. יכולת לשנות את חייך מהשורש בלי פחד יתר. שינויים גדולים שחיכיתם להם — הגיע הזמן.',
+  'פלוטו|3|ירח':  'פלוטו זורם עם ירחך הנטלי — שינוי רגשי עמוק שמגיע בצורה מרפאה. ריפוי דפוסים ישנים, שיחרור מה שלא שרת אתכם.',
+  'פלוטו|4|שמש':  'פלוטו מתמקם מול שמשך הנטלי — כוחות ומבנים שיש לשנות. עמדו על שלכם, אבל הכירו בשינוי הבלתי נמנע. מה שיישאר יהיה אמיתי.',
+
+  // ── נפטון ──────────────────────────────────────────────────────────────
+  'נפטון|0|שמש':  'נפטון מתמזג עם שמשך הנטלי — ערפל על הזהות, "מי אני?" הופכת לשאלה אמיתית. זהו זמן לחלומות, רוחניות ואמנות — אבל גם לזהירות מהטעיות ומאשליות עצמיות. מה שאתם יוצרים עכשיו בא מהנשמה.',
+  'נפטון|2|שמש':  'נפטון מאתגר את שמשך הנטלי — אשליות יכולות לבלבל. אנשים אחרים אולי לא מה שנדמים. בדקו עובדות לפני החלטות גדולות ושמרו על גבולות ברורים.',
+  'נפטון|3|שמש':  'נפטון מברך את שמשך הנטלי — השראה רוחנית ויצירתית. האינטואיציה בשיאה. מצוין לאמנות, מדיטציה ולכל מה שבא מלב עמוק. האמינו בחלומות.',
+  'נפטון|0|ירח':  'נפטון מתמזג עם ירחך הנטלי — רגשות עמוקים ורוחניים. אמפתיה גבוהה מאוד, הגבול בין עצמכם לסביבה מיטשטש. הישמרו מספיגת אנרגיות שאינן שלכם. אמנות ומדיטציה יביאו שקט.',
+  'נפטון|2|ירח':  'נפטון מאתגר את ירחך הנטלי — הרגשות מבולבלים, קשה להבחין בין אינטואיציה לאשליה. קחו זמן לגלות מה אמיתי.',
+
+  // ── אורנוס ─────────────────────────────────────────────────────────────
+  'אורנוס|0|שמש':  'אורנוס מתמזג עם שמשך הנטלי — שינוי זהות פתאומי ומרתיע. החירות קוראת לכם בקול גדול. ייתכן אירוע בלתי צפוי שמשנה הכל. עזבו ישן, קבלו חדש — ייתכן שזה הזמן שחיכיתם לו.',
+  'אורנוס|2|שמש':  'אורנוס מאתגר את שמשך הנטלי — הפרעות ושינויים שאינכם שולטים בהם. להישאר גמיש — זה המפתח. מה שנשבר לא היה אמור להישאר. מה שיצמח מהשברים יהיה חדשני.',
+  'אורנוס|3|שמש':  'אורנוס זורם עם שמשך הנטלי — אנרגיה של שחרור ועצמאות. שינויים מבורכים מגיעים. ויתרו על ישן שכבר לא משרת ופתחו את הדלת לחדש.',
+  'אורנוס|0|ירח':  'אורנוס מתמזג עם ירחך הנטלי — טלטלה רגשית ושינויים בבית ובמשפחה. ייתכן שינוי בית, קשרים רגשיים חדשים, או פרידה. הרגשות הישנים כבר לא שולטים — אפשר לבנות חדש.',
+  'אורנוס|2|ירח':  'אורנוס מאתגר את ירחך הנטלי — חוסר יציבות רגשית, הפתעות בבית ובמשפחה. שמרו על גמישות ואל תאחזו חזק מדי במה שהיה.',
+
+  // ── מאדים ──────────────────────────────────────────────────────────────
+  'מאדים|0|שמש':  'מאדים מתמזג עם שמשך הנטלי — אנרגיה עצומה, תשוקה ורצון עז לפעול. זהו זמן ליוזמות גדולות ולביטוי עצמי חזק. כוונו את האנרגיה הפנומנלית הזאת ליצירה — לא לקונפליקטים מיותרים.',
+  'מאדים|0|ירח':  'מאדים מתמזג עם ירחך הנטלי — רגשות לוחמניים וצרכים רגשיים חזקים. עלול להיות עצבנות קלה, אבל גם עצמה ותשוקה עמוקה. השתמשו בפיזיות — ספורט, עשייה, בנייה.',
+  'מאדים|0|נוגה':  'מאדים מתמזג עם נוגה הנטלית שלך — אנרגיה רומנטית ומינית גבוהה. יחסים קיימים מתחממים, משיכות חדשות אפשריות. אנרגיה יצירתית גבוהה מאוד.',
+  'מאדים|2|שמש':  'מאדים מאתגר את שמשך הנטלי — אנרגיה נפיצה שיכולה להוביל לעימותים. השקיעו את הכוח בפרויקטים ובפעילות גופנית, לא בריבים. הכוח הזה הוא מתנה אם מכוונים אותו נכון.',
+  'מאדים|2|נוגה':  'מאדים מאתגר את נוגה הנטלית שלך — מתח ביחסים, גירויים בענייני כסף ולב. ייתכן קונפליקט עם אדם אהוב. הקפידו על דיאלוג ולא על עימות.',
+  'מאדים|3|שמש':  'מאדים זורם עם שמשך הנטלי — אנרגיה, מוטיבציה ועשייה נתמכת. הזמן לפרויקטים תובעניים, לספורט קשה, לאתגרים שנמנעתם מהם. הגוף והנפש מוכנים.',
+  'מאדים|3|ירח':  'מאדים זורם עם ירחך הנטלי — אנרגיה ותשוקה בהרמוניה עם הרגשות. הגוף והנפש מסונכרנים. מוטיבציה לטפל בצרכים ולממש רצונות.',
+
+  // ── נוגה ───────────────────────────────────────────────────────────────
+  'נוגה|0|שמש':  'נוגה מתמזגת עם שמשך הנטלי — יום מושלם ליחסים, אמנות ויופי. קסם אישי גבוה, אחרים נמשכים אליך. בקשות, פגישות, דייטים — כולם מקבלים גב. ה"כן" מגיע ביתר קלות.',
+  'נוגה|3|שמש':  'נוגה מברכת את שמשך הנטלי — יום של חן ויופי. הזמן לבקש טובה, ליצור דברים יפים ולהיות נחמד עם עצמך.',
+  'נוגה|0|ירח':  'נוגה מתמזגת עם ירחך הנטלי — רגשות אהבה עמוקים, חיבור בית, חיוביות. מצוין לענייני משפחה, לרומנטיקה ולדאגה לעצמך.',
+  'נוגה|0|מאדים': 'נוגה מתמזגת עם מאדים הנטלי שלך — אנרגיה גדולה ליצירה, רומנטיקה ופעולה נמרצת. תשוקה ויצירתיות בשיאם.',
+
+  // ── מרקורי ─────────────────────────────────────────────────────────────
+  'מרקורי|0|שמש':  'מרקורי מתמזג עם שמשך הנטלי — מחשבה חדה ותקשורת מוצלחת. כתיבה, שיחות חשובות, לימודים — הכל בפיק. שלחו את ההצעה, קבעו את הפגישה.',
+  'מרקורי|2|שמש':  'מרקורי מאתגר את שמשך הנטלי — היזהרו מאי-הבנות בתקשורת. בדקו פרטים, אל תניחו הנחות, וחכו לפני הודעות רגשיות.',
+  'מרקורי|3|שמש':  'מרקורי זורם עם שמשך הנטלי — יום מצוין לתקשורת, חוזים ושיחות חשובות. מה שתגידו היום ישמע ויזכר.',
+  'מרקורי|0|ירח':  'מרקורי מתמזג עם ירחך הנטלי — הרגשות מוצאים מילים. שיחות עמוקות, ביטוי רגשי קל יותר מהרגיל. כתבו ביומן, שוחחו עם קרובים.',
+
+  // ── שמש (מעבר) ─────────────────────────────────────────────────────────
+  'שמש|0|שמש':  'השמש חוזרת לשמשך הנטלי — "יום הולדת סולרי". תחילת מחזור שנתי חדש. הזמן להגדיר כוונות, לשחרר את מה שהיה ולצעוד קדימה עם בהירות.',
+  'שמש|0|ירח':  'השמש מתמזגת עם ירחך הנטלי — מפגש בין האגו לנפש. יום עם חיבור רגשי מלא. יצירה וקשרים עמוקים — הכל זמין.',
+  'שמש|3|ירח':  'השמש מברכת את ירחך הנטלי — יום של חיוביות רגשית. מצוין לפגישות חברתיות ולטיפול בענייני בית.',
+  'שמש|2|ירח':  'השמש מאתגרת את ירחך הנטלי — עצבנות ורגישות מוגברת. קחו דקה לפני תגובות.',
+  'שמש|3|שמש':  'השמש מברכת את שמשך הנטלי — יום של עוצמה אישית. ביטוי עצמי ומנהיגות מקבלים גב.',
+  'שמש|2|שמש':  'השמש מאתגרת את שמשך הנטלי — שאלות על זהות ותפקיד. מי אתה עכשיו לעומת מי שרצית להיות?',
+  'שמש|0|נוגה':  'השמש מתמזגת עם נוגה הנטלית — יום מבורך לאהבה ויופי. ה"כן" מגיע ביתר קלות.',
+  'שמש|0|מאדים': 'השמש מתמזגת עם מאדים הנטלי — אנרגיה, ביטחון ועשייה. יום ליוזמות ולפעולה נחרצת.',
+
+  // ── ירח (מעבר) ──────────────────────────────────────────────────────────
+  'ירח|0|שמש':  'הירח מתמזג עם שמשך הנטלי — גל רגשי שמחזק את הזהות. יום לביטוי עצמי אמיתי, לחיבורים ולפעולה מהלב.',
+  'ירח|3|שמש':  'הירח מברך את שמשך הנטלי — יום שמח ופתוח. רגשות חיוביים, קשרים נעימים ואנרגיה יצירתית.',
+  'ירח|2|שמש':  'הירח יוצר מתח עם שמשך הנטלי — מתח קל בין הלב לשכל. זהירות בשיחות רגישות.',
+  'ירח|0|ירח':  'הירח מתמזג עם ירחך הנטלי — "ירח חוזר". זמן עם אינטואיציה חדה, רגשות עמוקים וחיבור למשפחה.',
+  'ירח|0|נוגה':  'הירח מתמזג עם נוגה הנטלית — רגשות אהבה, יום נחמד לקשרים חברתיים ורומנטיים.',
+  'ירח|0|מאדים': 'הירח מתמזג עם מאדים הנטלי — אנרגיה ורגשות ביחד. עשייה ותשוקה — השתמשו בזה בכיוון חיובי.',
+  'ירח|2|ירח':  'הירח מאתגר את ירחך הנטלי — מתח רגשי קל. תנו לרגשות לעבור בלי להיסחף.',
+  'ירח|3|ירח':  'הירח זורם עם ירחך הנטלי — שלווה פנימית, יום לטיפול בעצמך ובאנשים הקרובים.',
+};
+
+const ASPECT_READING_FN=[
+  (t,n)=>FORECAST_READINGS[`${t}|0|${n}`]||`${t} מתמזג עם ${n} במפת הלידה שלך — כוחות שני הכוכבים מתאחדים לנקודת עוצמה. זוהי שעה של מיקוד, פעולה וביטוי של מה שעמוק בתוכך. ה"כן" הפנימי שלך חזק יותר מתמיד — פעלו לפיו.`,
+  (t,n)=>FORECAST_READINGS[`${t}|1|${n}`]||`${t} פותח הזדמנות דרך ${n} הנטלי שלך — דלת נפתחת שדורשת רק צעד אחד. התנאים נוחים, אבל הם לא יחכו לנצח. פעלו עכשיו בנינוחות ובכוונה.`,
+  (t,n)=>FORECAST_READINGS[`${t}|2|${n}`]||`${t} מאתגר את ${n} הנטלי שלך — מתח שמניע לצמיחה. ההתנגדות שאתם מרגישים היא בדיוק המקום שבו הצמיחה האמיתית מתחילה. אל תברחו — כנסו לתוכה בכוונה.`,
+  (t,n)=>FORECAST_READINGS[`${t}|3|${n}`]||`${t} זורם בהרמוניה עם ${n} הנטלי שלך — אנרגיה חיובית ותומכת. הכוחות השמימיים בצד שלכם. נצלו את הגב הזה לפעולה שהמתנתם לה — עכשיו הזמן.`,
+  (t,n)=>FORECAST_READINGS[`${t}|4|${n}`]||`${t} ניצב מול ${n} הנטלי שלך — שני כוחות גדולים דורשים איזון. מה שאתם רואים "מהצד השני" הוא בדיוק מה שאתם צריכים לשלב. מודעות, לא עימות, היא המפתח.`,
+  (t,n)=>FORECAST_READINGS[`${t}|5|${n}`]||`${t} מחייב כיוון מחדש ביחס ל${n} הנטלי שלך — התאמה קטנה תפתח דרך גדולה. משהו לא הולך בדיוק, אבל הפתרון קרוב. עצרו, הסתכלו מחדש, ואז המשיכו.`
+];
+const ASPECT_QUALITY_MAP={'☌':'עוצמה','⚹':'הזדמנות','□':'אתגר','△':'הרמוניה','☍':'מודעות','⚻':'כיוון מחדש'};
+
+// ─── Transit Reading ──────────────────────────────────────────────────────────
+function generateReading(){
+  const td=getDate('t');
+  document.getElementById('readingDate').textContent=td.split('-').reverse().join('/');
+  buildPlanetPositions();buildSignificantTransits();buildGeneralReading();
+}
+function buildPlanetPositions(){
+  const el=document.getElementById('planetPositionsContent');el.innerHTML='';
+  for(let i=0;i<13;i++){
+    const lon=transitData.lons[i],si=Math.floor(lon/30);
+    const{sign,deg,min}=lonToStr(lon);const rx=transitData.retros[i];
+    const dim=i>=7?'opacity:.7':'';const fs=i>=7?'font-size:11px;color:#8070a8':'';
+    el.innerHTML+=`<div class="planet-reading-row" style="${dim}"><span class="pread-glyph" style="color:${PLANETS[i].col}">${PLANETS[i].g}</span><span class="pread-name" style="color:${PLANETS[i].col}">${PLANETS[i].n}</span><span class="pread-pos">${sign.g} ${String(deg).padStart(2,'0')}°${rx?` <span style="color:#ff6060;font-size:10px">Rx</span>`:''}</span><span class="pread-text" style="${fs}">${PLANET_IN_SIGN[i][si]}</span></div>`;
+  }
+}
+function buildSignificantTransits(){
+  const el=document.getElementById('significantTransitsContent');el.innerHTML='';
+  const asps=calcAspects(natalData.lons,transitData.lons);
+  const pw=[10,8,6,7,8,9,10,7,7,9];
+  asps.sort((a,b)=>(pw[b.ti]/(b.orb+.1))-(pw[a.ti]/(a.orb+.1)));
+  const top=asps.slice(0,5);
+  if(!top.length){el.innerHTML='<div style="color:#7060a0;font-size:12px;padding:10px">אין מעברים משמעותיים כעת</div>';return;}
+  const aim={'☌':0,'⚹':1,'□':2,'△':3,'☍':4,'⚻':5};
+  top.forEach(({ni,ti,asp,orb})=>{
+    const tp=PLANETS[ti],np=PLANETS[ni];const exact=orb<.5;
+    const rs=exact?'border-right:3px solid #ffd700;padding-right:10px':'';
+    el.innerHTML+=`<div class="transit-reading-row" style="${rs}"><div class="transit-reading-header"><span class="t-planet-badge" style="color:${tp.col}">${tp.g} ${tp.n}</span><span class="t-aspect-sym ${asp.cls}">${asp.g}</span><span class="t-natal-badge">${np.g} ${np.n}</span><span class="orb-indicator">${orb.toFixed(1)}°${exact?' <span style="color:#ffd700">✦</span>':''}</span><span class="quality-badge">${ASPECT_QUALITY_MAP[asp.g]||''}</span></div><div class="transit-reading-text">${ASPECT_READING_FN[aim[asp.g]??0](tp.n,np.n)}</div></div>`;
+  });
+}
+function buildGeneralReading(){
+  const el=document.getElementById('generalReadingContent');
+  const asps=calcAspects(natalData.lons,transitData.lons);
+  const sunSi=Math.floor(transitData.lons[0]/30),moonSi=Math.floor(transitData.lons[1]/30);
+  const challenging=asps.filter(a=>a.asp.g==='□'||a.asp.g==='☍').length;
+  const harmonious=asps.filter(a=>a.asp.g==='△'||a.asp.g==='⚹').length;
+  const intense=asps.filter(a=>a.asp.g==='☌').length;
+  const retroNames=transitData.retros.map((r,i)=>r?PLANETS[i].n:null).filter(Boolean);
+  const mostExact=[...asps].sort((a,b)=>a.orb-b.orb)[0];
+  let h='<div class="general-reading-text">';
+  h+=`<div class="reading-paragraph">השמש שוכנת ב<span class="reading-highlight">${SIGNS[sunSi].n}</span> והירח ב<span class="reading-highlight">${SIGNS[moonSi].n}</span>. `;
+  const sunEl=SIGNS[sunSi].el,moonEl=SIGNS[moonSi].el;
+  if(sunSi===moonSi)h+=`שניהם באותו מזל — עת של עצמה ומיקוד. `;
+  else if(sunEl===moonEl)h+=`שניהם ב${SIGN_EL_HE[sunEl]} — אנרגיה אלמנטרית ממוקדת. `;
+  else h+=`האנרגיה הסולרית של ${SIGN_EL_HE[sunEl]} פוגשת את הרגישות הלונרית של ${SIGN_EL_HE[moonEl]}. `;
+  h+=`</div>`;
+  if(retroNames.length){h+=`<div class="reading-paragraph">⟲ <span class="reading-highlight">${retroNames.join(', ')}</span> ${retroNames.length>1?'נמצאים':'נמצא'} בנסיגה. עת של חשיבה מחדש ועיבוד פנימי. `;if(retroNames.includes('מרקורי'))h+=`מרקורי בנסיגה — זהירות בחוזים ובנסיעות. `;if(retroNames.includes('נוגה'))h+=`נוגה בנסיגה — שקיפות ביחסים. `;h+=`</div>`;}
+  h+=`<div class="reading-paragraph">`;
+  if(!asps.length)h+=`תקופה שקטה יחסית — אין מעברים דרמטיים. עת להתחזק.`;
+  else if(harmonious>challenging)h+=`האנרגיה הכללית <span class="reading-highlight">תומכת וחיובית</span> — ${harmonious} זוויות הרמוניות מול ${challenging} מאתגרות. נצלו הזדמנויות. `;
+  else if(challenging>harmonious)h+=`יש <span class="reading-highlight">מתח באוויר</span> — ${challenging} זוויות מאתגרות. צמחו דרך האתגר. `;
+  else h+=`האנרגיה <span class="reading-highlight">מאוזנת</span> — שילוב של אתגרים והזדמנויות. `;
+  if(intense>0)h+=`${intense} קוניונקציות מחזקות את עוצמת התקופה. `;
+  h+=`</div>`;
+  if(mostExact&&mostExact.orb<2){
+    const tp=PLANETS[mostExact.ti],np=PLANETS[mostExact.ni];const g=mostExact.asp.g;
+    h+=`<div class="reading-paragraph">✦ המעבר המדויק ביותר: <span class="reading-highlight">${tp.g} ${tp.n} ${g} ${np.g} ${np.n}</span> (${mostExact.orb.toFixed(2)}°). `;
+    if(g==='□'||g==='☍')h+=`פעלו בחוכמה ובסבלנות. `;
+    else if(g==='△'||g==='⚹')h+=`נצלו אנרגיה חיובית זו. `;
+    else if(g==='☌')h+=`עוצמה יוצאת דופן זמינה. `;
+    h+=`</div>`;
+  }
+  h+='</div>';el.innerHTML=h;
+}
+
+// ─── Natal View ───────────────────────────────────────────────────────────────
+function renderNatalView(){
+  drawNatalOnlyChart();buildNatalTables();buildNatalReading();buildHouseReading();
+}
+
+function buildHouseReading(){
+  const el=document.getElementById('houseReadingContent');
+  if(!el)return;
+  // מצא כוכבים בכל בית
+  const planetsByHouse={};
+  for(let h=1;h<=12;h++) planetsByHouse[h]=[];
+  natalData.lons.forEach((lon,pi)=>{
+    const h=getHouseBySystem(lon);
+    if(h>=1&&h<=12) planetsByHouse[h].push(PLANETS[pi]);
+  });
+  let html='';
+  HOUSE_DESC.forEach(hd=>{
+    const planets=planetsByHouse[hd.n]||[];
+    const hasPlanets=planets.length>0;
+    html+=`<div style="padding:6px 0;border-bottom:1px solid rgba(160,118,38,0.1)">
+      <div style="font-weight:700;color:var(--gold);font-size:11px">${hd.title}</div>
+      ${hasPlanets?`<div style="color:#c09040;font-size:11px;margin:2px 0">${planets.map(p=>`${p.g} ${p.n}`).join(' · ')}</div>`:''}
+      <div style="font-size:10px;color:#8070a0;line-height:1.5">${hd.text}</div>
+      <div style="font-size:9px;color:#a090c0;margin-top:2px">${hd.axis}</div>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+function drawNatalOnlyChart(){
+  const svg=document.getElementById('natalSvg');svg.innerHTML='';
+  drawZodiacBase(svg,'bgN');
+  drawHouses(svg,houses,true);
+  drawAxisLabels(svg,ascLon);
+  calcNatalAspects(natalData.lons).forEach(({pi,pj,asp})=>{
+    const p1=lonToXY(natalData.lons[pi],R.ai-5),p2=lonToXY(natalData.lons[pj],R.ai-5);
+    svg.appendChild(svgEl('line',{x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,stroke:asp.col,'stroke-width':'0.7','stroke-opacity':'0.45'}));
+  });
+  drawPlanets(svg,natalData,R.np,R.zi,15,false);
+  svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:8,fill:'#1a0840',stroke:'#6030a0','stroke-width':'1.5'}));
+}
+function buildNatalTables(){
+  const pt=document.getElementById('natalPlanetTable');
+  pt.innerHTML='<tr><th>כוכב</th><th>מזל</th><th>מעלה</th><th>בית</th></tr>';
+  natalData.lons.forEach((lon,i)=>{
+    const{sign,deg,min}=lonToStr(lon);const house=getHouseBySystem(lon);const rx=natalData.retros[i];
+    pt.innerHTML+=`<tr><td class="glyph-cell" style="color:${PLANETS[i].col}">${PLANETS[i].g}</td><td>${PLANETS[i].n}${rx?` <span class="retro">Rx</span>`:''}</td><td class="sign-glyph">${sign.g} ${sign.n} ${String(deg).padStart(2,'0')}°${String(min).padStart(2,'0')}'</td><td style="color:#a090ee">${house}</td></tr>`;
+  });
+  const ht=document.getElementById('natalHousesTable');
+  ht.innerHTML='<tr><th>בית</th><th>מזל</th><th>מעלה</th></tr>';
+  houses.forEach((lon,i)=>{const{sign,deg,min}=lonToStr(lon);ht.innerHTML+=`<tr><td style="color:#a090ee">${i+1}</td><td class="sign-glyph">${sign.g} ${sign.n}</td><td style="color:#ffd700">${String(deg).padStart(2,'0')}°${String(min).padStart(2,'0')}'</td></tr>`;});
+  const at=document.getElementById('natalAspectTable');
+  at.innerHTML='<tr><th>כוכב א</th><th>זווית</th><th>כוכב ב</th><th>הפרש</th></tr>';
+  calcNatalAspects(natalData.lons).sort((a,b)=>a.orb-b.orb).forEach(({pi,pj,asp,orb})=>{
+    const p1=PLANETS[pi],p2=PLANETS[pj];const exact=orb<0.5;
+    at.innerHTML+=`<tr${exact?' style="background:rgba(100,60,200,0.2)"':''}><td style="color:${p1.col}">${p1.g} ${p1.n}</td><td class="aspect-symbol ${asp.cls}">${asp.g}</td><td style="color:${p2.col}">${p2.g} ${p2.n}</td><td class="${orb<3?'orb-pos':'orb-neg'}">${orb.toFixed(1)}°</td></tr>`;
+  });
+}
+function buildNatalReading(){
+  const el=document.getElementById('natalReadingContent');
+  const sunSi=Math.floor(natalData.lons[0]/30),moonSi=Math.floor(natalData.lons[1]/30),ascSi=Math.floor(ascLon/30);
+  const sunHouse=getHouseBySystem(natalData.lons[0]),moonHouse=getHouseBySystem(natalData.lons[1]);
+  const elCount={fire:0,earth:0,air:0,water:0};
+  natalData.lons.slice(0,7).forEach(lon=>{elCount[SIGNS[Math.floor(lon/30)].el]++;});
+  const domEl=Object.entries(elCount).sort((a,b)=>b[1]-a[1])[0];
+  const modCount={cardinal:0,fixed:0,mutable:0};
+  natalData.lons.slice(0,7).forEach(lon=>{
+    const s=Math.floor(lon/30)%3;
+    if(s===0)modCount.cardinal++;else if(s===1)modCount.fixed++;else modCount.mutable++;
+  });
+  const domMod=Object.entries(modCount).sort((a,b)=>b[1]-a[1])[0];
+  const ascArch=SIGN_ARCHETYPE[ascSi];
+  const sunHD=HOUSE_DESC[sunHouse-1],moonHD=HOUSE_DESC[moonHouse-1];
+  let h='<div class="general-reading-text">';
+  // ASC / לאגנה
+  h+=`<div class="reading-paragraph">🌅 <strong>לאגנה (ASC) ב${SIGNS[ascSi].n}</strong> — ${ascArch.el} ${ascArch.mod}, שליט ${ascArch.ruler}.<br>
+    <span style="font-size:11px;color:#7060a0">ארכיטיפ: ${ascArch.theme}</span></div>`;
+  // שמש
+  h+=`<div class="reading-paragraph">☉ <strong>שמש ב${SIGNS[sunSi].n}</strong>${sunHD?` · בית ${sunHouse} (${sunHD.title})`:''}
+    <br><span style="font-size:11px;color:#7060a0">${PLANET_IN_SIGN[0][sunSi]}</span>
+    ${sunHD?`<br><span style="font-size:11px;color:#9080b0">📍 ${sunHD.text}</span>`:''}
+  </div>`;
+  // ירח
+  h+=`<div class="reading-paragraph">☽ <strong>ירח ב${SIGNS[moonSi].n}</strong>${moonHD?` · בית ${moonHouse} (${moonHD.title})`:''}
+    <br><span style="font-size:11px;color:#7060a0">${PLANET_IN_SIGN[1][moonSi]}</span>
+    ${moonHD?`<br><span style="font-size:11px;color:#9080b0">📍 ${moonHD.text}</span>`:''}
+  </div>`;
+  // אלמנט ומודוס
+  h+=`<div class="reading-paragraph">⚖️ <strong>אלמנט דומיננטי: ${SIGN_EL_HE[domEl[0]]}</strong> (${domEl[1]} כוכבים) · <strong>${MODALITY_DESC[domMod[0]].split(' — ')[0]}</strong><br>
+    <span style="font-size:11px;color:#7060a0">${MODALITY_DESC[domMod[0]]}</span></div>`;
+  h+='</div>';el.innerHTML=h;
+}
+
+// ─── Synastry View ────────────────────────────────────────────────────────────
+function recalcPerson2(){
+  const bd=document.getElementById('bDate2').value,bt=document.getElementById('bTime2').value;
+  const lat=parseFloat(document.getElementById('bLat2').value)||32.08;
+  if(!bd||!bt)return;
+  const [by,bm,bdd]=bd.split('-').map(Number),[bh,bmin]=bt.split(':').map(Number);
+  const bjd=toJD(by,bm,bdd,bh-3,bmin);
+  person2Data=computeAllPlanets(bjd);
+  asc2Lon=calcASC(bjd,lat);
+  houses2=Array.from({length:12},(_,i)=>mod360(asc2Lon+i*30));
+  renderSynastryView();
+}
+function renderSynastryView(){
+  if(!person2Data.lons.length)return;
+  drawSynastryChart();buildSynastryTables();buildSynastryReading();
+}
+function drawSynastryChart(){
+  const svg=document.getElementById('synastrySvg');svg.innerHTML='';
+  drawZodiacBase(svg,'bgS');
+  svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:R.to,fill:'none',stroke:'#999','stroke-width':'1'}));
+  drawHouses(svg,houses,false);
+  calcAspects(natalData.lons,person2Data.lons).forEach(({ni,ti,asp})=>{
+    const pn=lonToXY(natalData.lons[ni],R.ai),pt=lonToXY(person2Data.lons[ti],R.ai);
+    const attrs={x1:pn.x,y1:pn.y,x2:pt.x,y2:pt.y,stroke:asp.col,'stroke-width':'1.4','stroke-opacity':'0.6'};
+    if(asp.dash)attrs['stroke-dasharray']='7,4';
+    svg.appendChild(svgEl('line',attrs));
+  });
+  drawPlanets(svg,natalData,R.np,R.zi,14,false);
+  drawPlanets(svg,person2Data,R.tp,R.zo,14,true);
+  svg.appendChild(svgEl('circle',{cx:CX,cy:CY,r:10,fill:'#fff',stroke:'#999','stroke-width':'1.2'}));
+}
+function buildSynastryTables(){
+  const at=document.getElementById('synastryAspectTable');
+  at.innerHTML='<tr><th>אדם 1</th><th>זווית</th><th>אדם 2</th><th>הפרש</th><th>מדויק</th></tr>';
+  const asps=calcAspects(natalData.lons,person2Data.lons);
+  asps.sort((a,b)=>a.orb-b.orb).slice(0,40).forEach(({ni,ti,asp,orb})=>{
+    const p1=PLANETS[ni],p2=PLANETS[ti];const exact=orb<0.5;
+    at.innerHTML+=`<tr${exact?' style="background:rgba(100,60,200,0.2)"':''}><td style="color:${p1.col}">${p1.g} ${p1.n}</td><td class="aspect-symbol ${asp.cls}">${asp.g}</td><td style="color:${p2.col}">${p2.g} ${p2.n}</td><td class="${orb<3?'orb-pos':'orb-neg'}">${orb.toFixed(1)}°</td><td>${exact?'✦':''}</td></tr>`;
+  });
+  if(!asps.length)at.innerHTML+='<tr><td colspan="5" style="text-align:center;color:#6050a0;padding:20px">אין זוויות משמעותיות</td></tr>';
+}
+function buildSynastryReading(){
+  const el=document.getElementById('synastryReadingContent');
+  const asps=calcAspects(natalData.lons,person2Data.lons);
+  const harm=asps.filter(a=>a.asp.g==='△'||a.asp.g==='⚹'||a.asp.g==='☌').length;
+  const chall=asps.filter(a=>a.asp.g==='□'||a.asp.g==='☍').length;
+  const score=harm-chall*0.7;
+  let compat,cc;
+  if(score>=4){compat='גבוהה מאוד';cc='#44cc77';}
+  else if(score>=2){compat='גבוהה';cc='#88cc44';}
+  else if(score>=0){compat='ממוצעת';cc='#ffd700';}
+  else if(score>=-2){compat='מאתגרת';cc='#ff8833';}
+  else{compat='מורכבת';cc='#ff4444';}
+  const keyConj=asps.filter(a=>a.asp.g==='☌'&&(a.ni<4||a.ti<4));
+  const keyTri=asps.filter(a=>a.asp.g==='△'&&(a.ni<4||a.ti<4));
+  const keySq=asps.filter(a=>a.asp.g==='□'&&(a.ni<4||a.ti<4));
+  let h='<div class="general-reading-text">';
+  h+=`<div class="reading-paragraph">תאימות כללית: <span style="color:${cc};font-weight:700;font-size:15px">${compat}</span><br><span style="font-size:11px;color:#7060a0">${harm} זוויות הרמוניות | ${chall} זוויות מאתגרות</span></div>`;
+  if(keyConj.length)h+=`<div class="reading-paragraph">☌ חיבורים עמוקים: ${keyConj.slice(0,3).map(a=>`<span class="reading-highlight">${PLANETS[a.ni].n} ☌ ${PLANETS[a.ti].n}</span>`).join(', ')}</div>`;
+  if(keyTri.length)h+=`<div class="reading-paragraph">△ זרימה הרמונית: ${keyTri.slice(0,3).map(a=>`<span style="color:#44cc77">${PLANETS[a.ni].n} △ ${PLANETS[a.ti].n}</span>`).join(', ')}</div>`;
+  if(keySq.length)h+=`<div class="reading-paragraph">□ אתגרי גדילה: ${keySq.slice(0,3).map(a=>`<span style="color:#ff8833">${PLANETS[a.ni].n} □ ${PLANETS[a.ti].n}</span>`).join(', ')}</div>`;
+  h+='</div>';el.innerHTML=h;
+}
+
+// ─── Forecast View ────────────────────────────────────────────────────────────
+function renderForecastView(){
+  const el=document.getElementById('forecastContent');
+  el.innerHTML='<div style="color:#a090ee;text-align:center;padding:30px;font-size:14px">⏳ מחשב תחזית...</div>';
+  setTimeout(buildForecast,50);
+}
+function jdToDateHe(jd){
+  const d=new Date((jd-2440587.5)*86400000);
+  return`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+}
+function buildForecast(){
+  const days=parseInt(document.getElementById('forecastDays').value)||90;
+  const today=new Date();
+  const startJD=toJD(today.getFullYear(),today.getMonth()+1,today.getDate(),12,0);
+  const orbThr=1.2;
+  const minOrbs={};
+  const pnames=['','','mercury','venus','mars','jupiter','saturn','uranus','neptune','pluto'];
+  const getLon=(pi,T,jd)=>pi===0?sunLon(T):pi===1?moonLonAccurate(jd):geoLon(pnames[pi],T);
+  // Scan fast planets daily
+  const fastPis=[0,2,3,4,5,6];
+  for(let d=0;d<=days;d++){
+    const jd=startJD+d,T=(jd-2451545)/36525;
+    fastPis.forEach(pi=>{
+      const tLon=getLon(pi,T,jd);
+      natalData.lons.forEach((nLon,ni)=>{
+        let diff=Math.abs(tLon-nLon);if(diff>180)diff=360-diff;
+        ASPECTS.forEach((asp,ai)=>{
+          const orb=Math.abs(diff-asp.a);
+          if(orb<=orbThr){const k=`${pi}-${ni}-${ai}`;if(!minOrbs[k]||orb<minOrbs[k].orb)minOrbs[k]={jd,pi,ni,asp,orb};}
+        });
+      });
+    });
+  }
+  // Scan outer planets every 3 days
+  for(let d=0;d<=days;d+=3){
+    const jd=startJD+d,T=(jd-2451545)/36525;
+    [7,8,9].forEach(pi=>{
+      const tLon=getLon(pi,T,jd);
+      natalData.lons.forEach((nLon,ni)=>{
+        let diff=Math.abs(tLon-nLon);if(diff>180)diff=360-diff;
+        ASPECTS.forEach((asp,ai)=>{
+          const orb=Math.abs(diff-asp.a);
+          if(orb<=orbThr){const k=`${pi}-${ni}-${ai}`;if(!minOrbs[k]||orb<minOrbs[k].orb)minOrbs[k]={jd,pi,ni,asp,orb};}
+        });
+      });
+    });
+  }
+  const events=Object.values(minOrbs).sort((a,b)=>a.jd-b.jd);
+  const el=document.getElementById('forecastContent');
+  if(!events.length){el.innerHTML='<div style="color:#7060a0;text-align:center;padding:30px">לא נמצאו מעברים משמעותיים בתקופה זו</div>';return;}
+  const aim={'☌':0,'⚹':1,'□':2,'△':3,'☍':4,'⚻':5};
+  let h='<div class="forecast-list">';
+  events.forEach(({jd,pi,ni,asp,orb})=>{
+    const tp=PLANETS[pi],np=PLANETS[ni];
+    const text=ASPECT_READING_FN[aim[asp.g]??0](tp.n,np.n);
+    const isCh=asp.g==='□'||asp.g==='☍';const isHa=asp.g==='△'||asp.g==='⚹';
+    const bc=isCh?'#ff4040':isHa?'#44cc77':'#9060ff';
+    const bg=isCh?'rgba(200,60,40,.08)':isHa?'rgba(60,200,80,.08)':'rgba(120,60,200,.08)';
+    h+=`<div class="forecast-event" style="border-right:3px solid ${bc};background:${bg}"><div class="forecast-date">${jdToDateHe(jd)}</div><div class="forecast-header"><span class="t-planet-badge" style="color:${tp.col}">${tp.g} ${tp.n}</span><span class="t-aspect-sym ${asp.cls}">${asp.g}</span><span class="t-natal-badge">${np.g} ${np.n} (נטלי)</span><span class="orb-indicator">${orb.toFixed(1)}°</span></div><div class="forecast-text">${text}</div></div>`;
+  });
+  h+='</div>';el.innerHTML=h;
+}
+
+// ─── Horoscope View ───────────────────────────────────────────────────────────
+function renderHoroscopeView(){
+  const today=new Date();
+  const todayJD=toJD(today.getFullYear(),today.getMonth()+1,today.getDate(),12,0);
+  const T=(todayJD-2451545)/36525;
+  const todayLons=[sunLon(T),moonLonAccurate(todayJD),geoLon('mercury',T),geoLon('venus',T),geoLon('mars',T),geoLon('jupiter',T),geoLon('saturn',T),geoLon('uranus',T),geoLon('neptune',T),geoLon('pluto',T)];
+  const ds=`${String(today.getDate()).padStart(2,'0')}/${String(today.getMonth()+1).padStart(2,'0')}/${today.getFullYear()}`;
+  document.getElementById('horoDate').textContent=ds;
+  document.getElementById('horoSubDate').textContent=ds;
+  const moonSi=Math.floor(todayLons[1]/30),sunSi=Math.floor(todayLons[0]/30);
+  document.getElementById('horoMoonInfo').textContent=`☽ ירח ב${SIGNS[moonSi].n} ${SIGNS[moonSi].g}`;
+  document.getElementById('horoSunInfo').textContent=`☉ שמש ב${SIGNS[sunSi].n} ${SIGNS[sunSi].g}`;
+  const userSunSi=Math.floor(natalData.lons[0]/30);
+  const grid=document.getElementById('horoGrid');grid.innerHTML='';
+  SIGNS.forEach((sign,si)=>{
+    const{text,score}=generateSignReading(si,todayLons);
+    const isUser=si===userSunSi;
+    const lvl=Math.max(5,Math.min(100,50+score*14));
+    const ec=score>=2?'#44cc77':score>=0?'#ffd700':score>=-2?'#ff8833':'#ff4444';
+    const el=score>=2?'⬆ גבוהה':score>=0?'↔ ממוצעת':score>=-2?'⬇ נמוכה':'⚠ מאתגרת';
+    grid.innerHTML+=`<div class="horo-card${isUser?' horo-user-sign':''}"><div class="horo-sign-header"><span class="horo-glyph" style="color:${sign.col}">${sign.g}</span><span class="horo-name">${sign.n}</span>${isUser?'<span class="horo-you-badge">☉ שלך</span>':''}</div><div class="horo-energy"><div class="horo-energy-bar" style="width:${lvl}%;background:${ec}"></div></div><div class="horo-energy-label" style="color:${ec}">${el}</div><div class="horo-text">${text}</div></div>`;
+  });
+}
+function generateSignReading(si,lons){
+  const conj=[],trine=[],sex=[],sq=[],opp=[];
+  lons.forEach((lon,pi)=>{
+    const psi=Math.floor(lon/30),off=((psi-si)+12)%12;
+    if(off===0)conj.push(pi);else if(off===2||off===10)sex.push(pi);
+    else if(off===4||off===8)trine.push(pi);else if(off===3||off===9)sq.push(pi);
+    else if(off===6)opp.push(pi);
+  });
+  const ben=[0,3,5],mal=[4,6,9];
+  let score=0;
+  [...trine,...sex].forEach(p=>{score+=ben.includes(p)?1:0.3;});
+  conj.forEach(p=>{score+=ben.includes(p)?1.5:mal.includes(p)?-1:0.5;});
+  [...sq,...opp].forEach(p=>{score+=mal.includes(p)?-1.5:-0.5;});
+  let text='';
+  if(conj.length)text+=`${conj.map(p=>PLANETS[p].n).join(', ')} ${conj.length>1?'שוכנים':'שוכן'} בסימנכם — אנרגיה ישירה. `;
+  if(trine.filter(p=>ben.includes(p)).length)text+=`${trine.filter(p=>ben.includes(p)).map(p=>PLANETS[p].n).join(', ')} שולח ברכה. `;
+  if(sex.filter(p=>ben.includes(p)).length)text+=`הזדמנויות מ${sex.filter(p=>ben.includes(p)).map(p=>PLANETS[p].n).join(', ')}. `;
+  if(sq.filter(p=>mal.includes(p)).length)text+=`${sq.filter(p=>mal.includes(p)).map(p=>PLANETS[p].n).join(', ')} יוצר מתח — פעלו בזהירות. `;
+  if(opp.length)text+=`${opp.map(p=>PLANETS[p].n).join(', ')} מול — נדרש איזון. `;
+  const moonOff=((Math.floor(lons[1]/30)-si)+12)%12;
+  const tones=['נלהב','מעשי','חברותי','רגשי','תשוקתי','מדויק','מאוזן','אינטנסיבי','אופטימי','ממוקד','חדשני','אינטואיטיבי'];
+  if(!text)text='יום מאוזן. הכוחות השמיימיים בהרמוניה עם סימנכם. ';
+  text+=`טון רגשי: ${tones[moonOff]||'מאוזן'}.`;
+  return{text,score};
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+window.addEventListener('load',()=>{
+  const today=new Date();
+  document.getElementById('tDay').value=today.getDate();
+  document.getElementById('tMonth').value=today.getMonth()+1;
+  document.getElementById('tYear').value=today.getFullYear();
+  recalc();
+  initAuth();
+  initPWA();
+  updateDateDisplay('b');
+  updateDateDisplay('t');
+});
+
+// ─── Mobile bar toggle ────────────────────────────────────────────────────────
+function togglePersonBar(){
+  const bar=document.getElementById('personBar');
+  const arrow=document.getElementById('barArrow');
+  bar.classList.toggle('expanded');
+  arrow.classList.toggle('open');
+}
+
+// ─── PWA ──────────────────────────────────────────────────────────────────────
+let pwaPrompt=null;
+function initPWA(){
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  }
+
+  window.addEventListener('beforeinstallprompt',e=>{
+    e.preventDefault();pwaPrompt=e;
+    document.getElementById('installBtn').classList.add('visible');
+  });
+  window.addEventListener('appinstalled',()=>{
+    document.getElementById('installBtn').classList.remove('visible');pwaPrompt=null;
+  });
+}
+function installPWA(){
+  if(pwaPrompt){pwaPrompt.prompt();pwaPrompt.userChoice.then(()=>{pwaPrompt=null;});}
+  else{
+    alert('להוספה למסך הבית:\n📱 iPhone: Safari → שתף → "הוסף למסך הבית"\n🤖 Android: Chrome → תפריט ⋮ → "הוסף למסך הבית"');
+  }
+}
+
+// ─── Drum Date Picker ─────────────────────────────────────────────────────────
+const MONTH_HE=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+let drumTarget=null;
+let drumState={day:1,month:1,year:1990};
+
+function openDrum(target){
+  drumTarget=target;
+  drumState={
+    day:   parseInt(document.getElementById(target+'Day').value)  ||1,
+    month: parseInt(document.getElementById(target+'Month').value)||1,
+    year:  parseInt(document.getElementById(target+'Year').value) ||1990
+  };
+  document.getElementById('drumTitle').textContent=target==='b'?'תאריך לידה':'תאריך מעברים';
+
+  // 1. הצג קודם — כדי שהעמודות יהיו גלויות לפני קביעת scrollTop
+  document.getElementById('drumModal').style.display='flex';
+
+  const days=Array.from({length:31},(_,i)=>String(i+1).padStart(2,'0'));
+  const years=Array.from({length:201},(_,i)=>String(1900+i));
+
+  // 2. בנה את העמודות + גלול אחרי שה-DOM מתעדכן
+  requestAnimationFrame(()=>{
+    buildDrumCol('drum-day',   days,     drumState.day-1,           v=>{drumState.day=parseInt(v);});
+    buildDrumCol('drum-month', MONTH_HE, drumState.month-1,         v=>{drumState.month=MONTH_HE.indexOf(v)+1;});
+    buildDrumCol('drum-year',  years,    drumState.year-1900,        v=>{drumState.year=parseInt(v);});
+  });
+}
+
+function buildDrumCol(id, items, selIdx, onChange){
+  const col=document.getElementById(id);
+  col.innerHTML='';
+  const padT=document.createElement('div');padT.className='drum-pad';col.appendChild(padT);
+  items.forEach(item=>{
+    const div=document.createElement('div');
+    div.className='drum-item';div.textContent=item;col.appendChild(div);
+  });
+  const padB=document.createElement('div');padB.className='drum-pad';col.appendChild(padB);
+
+  // גלול לאיבר הנבחר (המודאל כבר גלוי)
+  requestAnimationFrame(()=>{
+    col.scrollTop=selIdx*40;
+    markSel(col,selIdx);
+  });
+
+  let ticking=false;
+  col.addEventListener('scroll',()=>{
+    if(!ticking){requestAnimationFrame(()=>{
+      const idx=Math.round(col.scrollTop/40);
+      markSel(col,idx);
+      if(items[idx]!==undefined) onChange(items[idx]);
+      ticking=false;
+    });ticking=true;}
+  });
+}
+
+function markSel(col,idx){
+  col.querySelectorAll('.drum-item').forEach((el,i)=>el.classList.toggle('sel',i===idx));
+}
+
+function confirmDrum(){
+  const p=drumTarget;
+  document.getElementById(p+'Day').value=drumState.day;
+  document.getElementById(p+'Month').value=drumState.month;
+  document.getElementById(p+'Year').value=drumState.year;
+  updateDateDisplay(p);
+  closeDrum();
+  recalc();
+}
+
+function closeDrum(){document.getElementById('drumModal').style.display='none';}
+function drumCloseBg(e){if(e.target===document.getElementById('drumModal'))closeDrum();}
+
+function updateDateDisplay(p){
+  const d=document.getElementById(p+'Day').value;
+  const m=parseInt(document.getElementById(p+'Month').value);
+  const y=document.getElementById(p+'Year').value;
+  const el=document.getElementById(p+'DateDisplay');
+  if(el) el.firstChild.textContent=`${d} ${MONTH_HE[m-1]} ${y}`;
+}
+
+// ─── Subscription Management ─────────────────────────────────────────────────
+function renderSubscriptionView(){
+  const u=getAuth();
+  if(!u){
+    document.getElementById('subStatusCard').innerHTML=
+      `<div style="text-align:center;padding:24px;color:var(--text-dim)">
+        <div style="font-size:32px;margin-bottom:10px">🔐</div>
+        <div style="font-size:14px;margin-bottom:14px">יש להתחבר כדי לנהל מנוי</div>
+        <button class="btn-plan btn-plan-fill" style="width:auto;padding:8px 24px" onclick="openAuthModal()">כניסה / הרשמה</button>
+      </div>`;
+    return;
+  }
+
+  const SUBS_KEY='astro_sub_v1';
+  const subs=JSON.parse(localStorage.getItem(SUBS_KEY)||'{}');
+  const sub=subs[u.email];
+  const profiles=getUserProfiles(u.email);
+
+  const badge=document.getElementById('subBadge');
+  const planName=document.getElementById('subPlanName');
+  const startDate=document.getElementById('subStartDate');
+  const endDate=document.getElementById('subEndDate');
+  const price=document.getElementById('subPrice');
+  const mapsUsed=document.getElementById('subMapsUsed');
+  const notify=document.getElementById('subNotify');
+
+  mapsUsed.textContent=`${profiles.length} / 15`;
+
+  if(sub && sub.active && new Date(sub.endDate)>new Date()){
+    badge.className='sub-badge sub-badge-active';
+    badge.textContent='⬤ פעיל';
+    planName.textContent=sub.planLabel||'פרמיום';
+    startDate.textContent=formatSubDate(sub.startDate);
+    endDate.textContent=formatSubDate(sub.endDate);
+    price.textContent=sub.price||'₪49/חודש';
+    notify.textContent=sub.notify||'לא מוגדר';
+  } else {
+    badge.className='sub-badge sub-badge-trial';
+    badge.textContent='⬤ ניסיון חינמי';
+    planName.textContent='חינמי';
+    startDate.textContent='—';endDate.textContent='—';
+    price.textContent='חינם';notify.textContent='לא פעיל';
+  }
+}
+
+function formatSubDate(d){
+  if(!d)return'—';
+  const dt=new Date(d);
+  return`${String(dt.getDate()).padStart(2,'0')}/${String(dt.getMonth()+1).padStart(2,'0')}/${dt.getFullYear()}`;
+}
+
+function subscribePlan(plan){
+  const u=getAuth();
+  if(!u){openAuthModal();return;}
+  // במצב demo — שומר מנוי מדומה ל-30 יום
+  const SUBS_KEY='astro_sub_v1';
+  const subs=JSON.parse(localStorage.getItem(SUBS_KEY)||'{}');
+  const now=new Date();
+  const end=new Date(now);
+  end.setMonth(end.getMonth()+(plan==='annual'?12:1));
+  subs[u.email]={
+    active:true,
+    plan,
+    planLabel:plan==='annual'?'פרמיום שנתי':'פרמיום',
+    startDate:now.toISOString(),
+    endDate:end.toISOString(),
+    price:plan==='annual'?'₪490/שנה':'₪49/חודש',
+    notify:'לא מוגדר'
+  };
+  localStorage.setItem(SUBS_KEY,JSON.stringify(subs));
+  alert(`✦ ברוכים הבאים למנוי ${plan==='annual'?'שנתי':'חודשי'} פרמיום!\n\nבגרסה זו המנוי נשמר לדמו בלבד.\nלחיוב אמיתי יש לחבר מערכת תשלום (Stripe / PayPlus).`);
+  renderSubscriptionView();
+}
+
+// ─── Cities DB ────────────────────────────────────────────────────────────────
+const CITIES={
+  'תל אביב':[32.08,34.78],'יפו':[32.05,34.75],'ירושלים':[31.78,35.22],
+  'חיפה':[32.82,35.00],'באר שבע':[31.25,34.79],'אילת':[29.56,34.95],
+  'נתניה':[32.33,34.85],'אשדוד':[31.80,34.65],'אשקלון':[31.67,34.57],
+  'ראשון לציון':[31.97,34.80],'פתח תקווה':[32.08,34.88],'חולון':[32.01,34.78],
+  'רמת גן':[32.07,34.82],'בני ברק':[32.08,34.83],'הרצליה':[32.16,34.84],
+  'כפר סבא':[32.18,34.91],'רחובות':[31.90,34.81],'בת ים':[32.02,34.75],
+  'רמלה':[31.93,34.87],'לוד':[31.95,34.89],'מודיעין':[31.89,35.01],
+  'עפולה':[32.61,35.29],'טבריה':[32.79,35.53],'נצרת':[32.70,35.30],
+  'דימונה':[31.07,35.03],'קריית שמונה':[33.21,35.57],'עכו':[32.92,35.08],
+  'נהריה':[33.00,35.10],'צפת':[32.96,35.50],'יהוד':[31.89,34.88],
+  'גבעתיים':[32.07,34.81],'אור יהודה':[32.03,34.85],'אריאל':[32.11,35.17],
+  'מעלות':[33.01,35.27],'טירת כרמל':[32.76,34.97],'זכרון יעקב':[32.57,34.95],
+  'London':[51.51,-0.13],'New York':[40.71,-74.01],'Paris':[48.85,2.35],
+  'Berlin':[52.52,13.41],'Moscow':[55.75,37.62],'Istanbul':[41.01,28.95],
+};
+
+function onCityInput(){
+  const val=document.getElementById('pCity').value.trim();
+  const dl=document.getElementById('cityList');
+  dl.innerHTML='';
+  Object.keys(CITIES).filter(c=>c.startsWith(val)||c.includes(val)).slice(0,8).forEach(c=>{
+    const o=document.createElement('option');o.value=c;dl.appendChild(o);
+  });
+  if(CITIES[val]){
+    document.getElementById('pLat').value=CITIES[val][0];
+    document.getElementById('pLon').value=CITIES[val][1];
+  }
+}
+
+// ─── Auth & Profiles ──────────────────────────────────────────────────────────
+const AUTH_KEY='astro_auth_v1';
+const PROFILES_KEY='astro_profiles_v1';
+const MAX_PROFILES=15;
+
+function getAuth(){try{return JSON.parse(localStorage.getItem(AUTH_KEY))||null;}catch{return null;}}
+function setAuth(u){localStorage.setItem(AUTH_KEY,JSON.stringify(u));}
+function clearAuth(){localStorage.removeItem(AUTH_KEY);}
+
+function getAllProfiles(){try{return JSON.parse(localStorage.getItem(PROFILES_KEY))||{};}catch{return {};}}
+function getUserProfiles(email){return getAllProfiles()[email]||[];}
+function saveUserProfiles(email,profiles){
+  const all=getAllProfiles();all[email]=profiles;
+  localStorage.setItem(PROFILES_KEY,JSON.stringify(all));
+}
+
+function initAuth(){
+  const u=getAuth();
+  if(u) showUserUI(u);
+  else showLoginBtn();
+}
+
+function showUserUI(u){
+  document.getElementById('loginBtn').style.display='none';
+  const badge=document.getElementById('userBadge');
+  badge.style.display='flex';
+  const avatar=document.getElementById('userAvatar');
+  if(u.picture){
+    // תמונת פרופיל Google
+    avatar.innerHTML=`<img src="${u.picture}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;" referrerpolicy="no-referrer">`;
+    avatar.style.background='none';
+  } else {
+    const initials=(u.firstName?.[0]||'')+(u.lastName?.[0]||'');
+    avatar.textContent=initials.toUpperCase();
+    avatar.style.background='linear-gradient(135deg,var(--gold),var(--gold-bright))';
+  }
+  document.getElementById('userDisplayName').textContent=`${u.firstName} ${u.lastName||''}`.trim();
+  document.getElementById('userPlanLabel').textContent='מנוי פרמיום ✦';
+  updateProfileCountBadge(u.email);
+}
+
+function showLoginBtn(){
+  document.getElementById('loginBtn').style.display='';
+  document.getElementById('userBadge').style.display='none';
+}
+
+function updateProfileCountBadge(email){
+  const n=getUserProfiles(email).length;
+  document.getElementById('profileCountBadge').textContent=n?`(${n})`:'';
+  const lbl=document.getElementById('profileCountLabel');
+  if(lbl) lbl.textContent=`${n}/${MAX_PROFILES}`;
+}
+
+// ── Auth Modal ──
+function openAuthModal(){
+  document.getElementById('authModal').style.display='flex';
+  switchTab('login');
+}
+function closeAuthModal(){document.getElementById('authModal').style.display='none';}
+function closeAuthIfBg(e){if(e.target===document.getElementById('authModal'))closeAuthModal();}
+
+function switchTab(t){
+  ['login','register'].forEach(x=>{
+    document.getElementById('tab-'+x).classList.toggle('active',x===t);
+    document.getElementById('pane-'+x).style.display=x===t?'block':'none';
+  });
+}
+
+function getUsersDB(){try{return JSON.parse(localStorage.getItem('astro_users_v1'))||{};}catch{return {};}}
+function saveUsersDB(db){localStorage.setItem('astro_users_v1',JSON.stringify(db));}
+
+function doRegister(){
+  const first=document.getElementById('regFirst').value.trim();
+  const last=document.getElementById('regLast').value.trim();
+  const email=document.getElementById('regEmail').value.trim().toLowerCase();
+  const pass=document.getElementById('regPass').value;
+  const err=document.getElementById('regError');
+  if(!first||!email||!pass){err.textContent='נא למלא שם, אימייל וסיסמה';err.style.display='block';return;}
+  if(pass.length<6){err.textContent='הסיסמה חייבת להכיל לפחות 6 תווים';err.style.display='block';return;}
+  const db=getUsersDB();
+  if(db[email]){err.textContent='אימייל זה כבר רשום — נסה להיכנס';err.style.display='block';return;}
+  db[email]={firstName:first,lastName:last,passHash:simpleHash(pass)};
+  saveUsersDB(db);
+  const u={email,firstName:first,lastName:last};
+  setAuth(u);closeAuthModal();showUserUI(u);
+}
+
+function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass=document.getElementById('loginPass').value;
+  const err=document.getElementById('loginError');
+  const db=getUsersDB();
+  if(!db[email]||db[email].passHash!==simpleHash(pass)){
+    err.textContent='אימייל או סיסמה שגויים';err.style.display='block';return;
+  }
+  const u={email,firstName:db[email].firstName,lastName:db[email].lastName};
+  setAuth(u);closeAuthModal();showUserUI(u);
+}
+
+// ─── Google Client ID ─────────────────────────────────────────────────────────
+// להגדרה: console.cloud.google.com → APIs & Services → Credentials
+// → Create OAuth 2.0 Client ID → Web application
+// → Authorized JavaScript origins: http://127.0.0.1:8765
+const GOOGLE_CLIENT_ID='';  // ← הדבק כאן את ה-Client ID שלך
+
+function initGoogleSignIn(){
+  if(!GOOGLE_CLIENT_ID||typeof google==='undefined')return;
+  google.accounts.id.initialize({
+    client_id:GOOGLE_CLIENT_ID,
+    callback:handleGoogleCredential,
+    auto_select:false,
+    cancel_on_tap_outside:true,
+    ux_mode:'popup',
+  });
+}
+
+function handleGoogleCredential(response){
+  try{
+    // פענוח JWT (payload חתום על ידי Google)
+    const payload=JSON.parse(atob(response.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    const email=(payload.email||'').toLowerCase();
+    const firstName=payload.given_name||payload.name?.split(' ')[0]||'משתמש';
+    const lastName=payload.family_name||payload.name?.split(' ').slice(1).join(' ')||'';
+    const picture=payload.picture||'';
+    const db=getUsersDB();
+    if(!db[email]){
+      db[email]={firstName,lastName,passHash:'',picture};
+      saveUsersDB(db);
+    } else {
+      // עדכון תמונה ושם מ-Google
+      db[email].picture=picture;
+      db[email].firstName=db[email].firstName||firstName;
+      db[email].lastName=db[email].lastName||lastName;
+      saveUsersDB(db);
+    }
+    const u={email,firstName:db[email].firstName,lastName:db[email].lastName,picture};
+    setAuth(u);closeAuthModal();showUserUI(u);
+  } catch(e){
+    console.error('Google login error',e);
+    alert('שגיאה בכניסה עם Google — בדוק את ה-Client ID');
+  }
+}
+
+function doGoogleLogin(){
+  if(!GOOGLE_CLIENT_ID){
+    // הוראות למשתמש
+    const msg=`כדי להפעיל כניסה עם Google:\n\n`+
+      `1. עבור ל-console.cloud.google.com\n`+
+      `2. צור פרויקט חדש\n`+
+      `3. APIs & Services → Credentials\n`+
+      `4. Create Credentials → OAuth 2.0 Client ID\n`+
+      `5. Application type: Web application\n`+
+      `6. Authorized JavaScript origins:\n   http://127.0.0.1:8765\n`+
+      `7. העתק את Client ID\n`+
+      `8. הדבק ב-GOOGLE_CLIENT_ID בקוד\n\n`+
+      `לעת עתה — השתמשי בהרשמה רגילה עם אימייל.`;
+    alert(msg);
+    return;
+  }
+  if(typeof google==='undefined'){
+    alert('ספריית Google לא נטענה — בדוק חיבור לאינטרנט');
+    return;
+  }
+  google.accounts.id.prompt((notification)=>{
+    if(notification.isNotDisplayed()||notification.isSkippedMoment()){
+      // fallback — פתח popup ישיר
+      google.accounts.id.renderButton(
+        document.createElement('div'),
+        {theme:'outline',size:'large'}
+      );
+    }
+  });
+}
+
+function logout(){
+  clearAuth();showLoginBtn();closeProfiles();
+}
+
+function simpleHash(s){
+  let h=0;for(let i=0;i<s.length;i++){h=(Math.imul(31,h)+s.charCodeAt(i))|0;}
+  return h.toString(36);
+}
+
+// ── Profiles Panel ──
+function openProfiles(){
+  const u=getAuth();if(!u)return;
+  renderProfilesList(u.email);
+  document.getElementById('profilesPanel').style.display='flex';
+}
+function closeProfiles(){document.getElementById('profilesPanel').style.display='none';}
+
+function renderProfilesList(email){
+  const profiles=getUserProfiles(email);
+  const container=document.getElementById('profilesList');
+  const addBtn=document.getElementById('addProfileBtnPanel');
+  updateProfileCountBadge(email);
+  container.innerHTML='';
+  if(!profiles.length){
+    container.innerHTML='<div style="text-align:center;color:#aaa;font-size:12px;padding:30px 0">אין מפות שמורות עדיין<br><br>לחץ ＋ להוספה</div>';
+  } else {
+    profiles.forEach((p,idx)=>{
+      const card=document.createElement('div');
+      card.className='profile-card';
+      const d=`${String(p.birthDay).padStart(2,'0')}/${String(p.birthMonth).padStart(2,'0')}/${p.birthYear}`;
+      card.innerHTML=`
+        <button class="profile-card-del" onclick="deleteProfile(event,${idx})" title="מחק">🗑</button>
+        <div class="profile-card-name">${p.firstName} ${p.lastName||''}</div>
+        <div class="profile-card-info">📅 ${d} &nbsp;·&nbsp; ⏰ ${p.birthTime||'--:--'}<br>📍 ${p.birthCity||'לא צוין'}</div>`;
+      card.onclick=()=>loadProfile(p);
+      container.appendChild(card);
+    });
+  }
+  addBtn.style.display=profiles.length>=MAX_PROFILES?'none':'block';
+}
+
+function deleteProfile(e,idx){
+  e.stopPropagation();
+  if(!confirm('למחוק מפה זו?'))return;
+  const u=getAuth();if(!u)return;
+  const profiles=getUserProfiles(u.email);
+  profiles.splice(idx,1);
+  saveUserProfiles(u.email,profiles);
+  renderProfilesList(u.email);
+}
+
+function loadProfile(p){
+  document.getElementById('bDay').value=p.birthDay;
+  document.getElementById('bMonth').value=p.birthMonth;
+  document.getElementById('bYear').value=p.birthYear;
+  const [ph,pm]=(p.birthTime||'12:00').split(':').map(Number);
+  document.getElementById('bHour').value=ph||0;
+  document.getElementById('bMin').value=pm||0;
+  document.getElementById('bLat').value=p.birthLat||32.82;
+  document.getElementById('bLon').value=p.birthLon||35.00;
+  updateDateDisplay('b');
+  closeProfiles();
+  recalc();
+}
+
+// ── Add Profile Modal ──
+function openAddProfileModal(){
+  closeProfiles();
+  // Pre-fill from current birth inputs
+  document.getElementById('pDay').value=document.getElementById('bDay').value;
+  document.getElementById('pMonth').value=document.getElementById('bMonth').value;
+  document.getElementById('pYear').value=document.getElementById('bYear').value;
+  const hh=String(document.getElementById('bHour').value).padStart(2,'0');
+  const mm=String(document.getElementById('bMin').value).padStart(2,'0');
+  document.getElementById('pTime').value=`${hh}:${mm}`;
+  document.getElementById('pLat').value=document.getElementById('bLat').value;
+  document.getElementById('pLon').value=document.getElementById('bLon').value;
+  document.getElementById('addProfileModal').style.display='flex';
+  // Populate datalist
+  const dl=document.getElementById('cityList');
+  dl.innerHTML='';
+  Object.keys(CITIES).forEach(c=>{const o=document.createElement('option');o.value=c;dl.appendChild(o);});
+}
+function closeAddProfileModal(){document.getElementById('addProfileModal').style.display='none';}
+function closeAddProfileIfBg(e){if(e.target===document.getElementById('addProfileModal'))closeAddProfileModal();}
+
+function saveProfile(){
+  const u=getAuth();
+  if(!u){alert('נא להתחבר תחילה');return;}
+  const first=document.getElementById('pFirst').value.trim();
+  const last=document.getElementById('pLast').value.trim();
+  const day=parseInt(document.getElementById('pDay').value);
+  const month=parseInt(document.getElementById('pMonth').value);
+  const year=parseInt(document.getElementById('pYear').value);
+  const time=document.getElementById('pTime').value;
+  const city=document.getElementById('pCity').value.trim();
+  const lat=parseFloat(document.getElementById('pLat').value);
+  const lon=parseFloat(document.getElementById('pLon').value);
+  const err=document.getElementById('addProfileError');
+  if(!first||!day||!month||!year){err.textContent='נא למלא שם ותאריך לידה';err.style.display='block';return;}
+  const profiles=getUserProfiles(u.email);
+  if(profiles.length>=MAX_PROFILES){err.textContent=`הגעת למגבלה של ${MAX_PROFILES} מפות`;err.style.display='block';return;}
+  profiles.push({id:Date.now(),firstName:first,lastName:last,birthDay:day,birthMonth:month,birthYear:year,birthTime:time,birthCity:city,birthLat:isNaN(lat)?32.82:lat,birthLon:isNaN(lon)?35.00:lon});
+  saveUserProfiles(u.email,profiles);
+  err.style.display='none';
+  closeAddProfileModal();
+  openProfiles();
+}
+</script>
+</body>
+</html>
