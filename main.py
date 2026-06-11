@@ -52,6 +52,15 @@ async def shaked_game():
         return f.read()
 
 
+@app.get("/astro", response_class=HTMLResponse)
+async def astro_chart():
+    """Serve the AstroIL transit chart app."""
+    import os
+    html_path = os.path.join(os.path.dirname(__file__), "transit-chart.html")
+    with open(html_path, "r", encoding="utf-8") as f:
+        return f.read()
+
+
 @app.get("/health")
 async def health():
     google_connected = gs.get_credentials() is not None

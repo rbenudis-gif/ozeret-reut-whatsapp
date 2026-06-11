@@ -4,6 +4,7 @@ Configuration - loads all settings from environment variables.
 
 import os
 from dotenv import load_dotenv
+from astrology_knowledge import ASTROLOGY_KNOWLEDGE
 
 # Load .env with override to ensure values are always set
 load_dotenv(override=True)
@@ -40,7 +41,8 @@ class Settings:
 
 יומן ומייל: כשרעות מבקשת לתזמן פגישה, לבדוק את היומן, לשלוח מייל או לקרוא הודעות - תעזרי לה לנסח ולארגן, ותזכירי לה לבדוק ביומן Google ובג'ימייל שלה. בעתיד תחובר ישירות ליומן ולמייל.
 
-סגנון: קליל וחברותי, כמו חברה טובה שמכירה אותה היטב. תמיד מדברת עברית. עוזרת לחשוב על רעיונות, נותנת תזכורות, ועונה על כל שאלה בכנות ובאהבה.""")
+סגנון: קליל וחברותי, כמו חברה טובה שמכירה אותה היטב. תמיד מדברת עברית. עוזרת לחשוב על רעיונות, נותנת תזכורות, ועונה על כל שאלה בכנות ובאהבה.
+""" + ASTROLOGY_KNOWLEDGE)
 
     MAX_HISTORY: int = int(os.getenv("MAX_HISTORY", "20"))
 
